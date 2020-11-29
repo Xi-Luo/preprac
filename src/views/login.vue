@@ -1,0 +1,108 @@
+<template>
+  <el-row :gutter="10">
+    <el-col :xs="{span:20,offset:2}"
+            :sm="{span: 16,offset:4}" :md="{span:14,offset: 5}" :lg="{span:8,offset: 8}">
+      <el-card style="margin-top: 10%">
+        <el-form :model="form" status-icon :rules="rules" ref="form" style="text-align: center">
+          <h2>登 录</h2>
+          <el-form-item prop="name" label="帐号" :label-width="formLabelWidth">
+            <el-input v-model="form.username" autocomplete="off" aria-required="true"></el-input>
+          </el-form-item>
+          <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
+            <el-input  v-model="form.password" autocomplete="off" show-password></el-input>
+          </el-form-item>
+          <el-button type="primary" @click="login('form')">登录</el-button>
+        </el-form>
+      </el-card>
+    </el-col>
+  </el-row>
+
+</template>
+
+<script>
+
+import {getAxios} from "@/store/api";
+import router from "@/router";
+import md5 from  'js-md5'
+
+
+export default {
+  name: "login",
+  data(){
+    let validateName = (rule, value, callback)=>{
+      if (value===''){
+        callback(new Error('请输入帐号'))
+      } else  {
+        callback();
+      }
+    };
+    let validatePass =  (rule, value, callback)=>{
+      if (value===''){
+        callback(new Error('请输入密码'))
+      }else {
+        callback();
+      }
+    };
+
+    return{
+      form: {
+        username: '',
+        password: ''
+      },
+      formLabelWidth: '40px',
+      rules:{
+        pass:[{
+          validator: validatePass,trigger:'blur'
+        }],
+        name:[{
+          validator: validateName, trigger: 'blur'
+        }]
+      }
+    }
+  },
+  methods:{
+    login(formName){
+      this.$refs[formName].validate((valid)=>{
+        if (valid){
+            getAxios(false).post('/user/login', {
+              username:this.form.username,
+              password: md5(this.form.password)
+            }).then(response=>{
+              // getAxios(false).post('/user/login',QS.stringify(this.form)).then(response=>{
+              // }
+            console.log('response',response);
+            if(response.status===200){
+              console.log('header',response.headers.authorization)
+              this.$store.commit('tokenSave',response.headers.authorization)
+              // this.$store.commit('userNameSave', )
+              this.$message({
+                message:'登录成功',
+                type:'success'
+              })
+              router.push({name:'information'})
+            }else{
+              this.$message({
+                message:'帐号或密码错误',
+                type: 'error'
+              });
+            }
+          }).catch(error=>{console.log(error);})
+        }else{
+          this.$message({
+            message:'帐号或密码错误',
+            type: 'error'
+          });
+          return false;
+        }
+      })
+
+    }
+  }
+
+
+}
+</script>
+
+<style scoped>
+
+</style>
