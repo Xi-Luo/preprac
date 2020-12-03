@@ -8,7 +8,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state:{
         token:'',
-        userName:''
+        userName:'',
+        menu:[]
     },
     mutations:{
         tokenSave(state, token){
@@ -16,6 +17,9 @@ export default new Vuex.Store({
         },
         userNameSave(state, userName){
             state.userName = userName;
+        },
+        menuSave(state, menu){
+            state.menu= menu;
         }
     },
     actions:{

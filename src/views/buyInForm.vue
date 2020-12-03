@@ -1,5 +1,6 @@
 <template>
 <div>
+  <navbar></navbar>
   <el-form :inline="true" class="demo-form-inline" :model="orderApply">
     <el-form-item label="编号">
       <el-input style="width: 8vw" aria-placeholder="编号" v-model="orderApply.id"></el-input>
@@ -178,8 +179,12 @@
 </template>
 
 <script>
+import navbar from "@/components/navbar";
 export default {
   name: "buyInForm",
+  components:{
+    navbar
+  },
   data() {
     return {
       dialogFormVisible: false,

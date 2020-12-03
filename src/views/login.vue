@@ -23,7 +23,9 @@
 
 import {getAxios} from "@/store/api";
 import router from "@/router";
-import md5 from  'js-md5'
+// import QS from "qs";
+// import md5 from  'js-md5'
+
 
 
 export default {
@@ -49,6 +51,11 @@ export default {
         username: '',
         password: ''
       },
+      menu:[],
+      menuItem:{
+        name:'',
+        index:''
+      },
       formLabelWidth: '40px',
       rules:{
         pass:[{
@@ -66,20 +73,22 @@ export default {
         if (valid){
             getAxios(false).post('/user/login', {
               username:this.form.username,
-              password: md5(this.form.password)
+              password: this.form.password
             }).then(response=>{
-              // getAxios(false).post('/user/login',QS.stringify(this.form)).then(response=>{
-              // }
             console.log('response',response);
-            if(response.status===200){
+            if(response.data.success===true){
               console.log('header',response.headers.authorization)
-              this.$store.commit('tokenSave',response.headers.authorization)
+              console.log('header',JSON.stringify(response.data.data))
+              this.$store.commit('tokenSave',response.headers.authorization);
+              window.sessionStorage.setItem('token',response.headers.authorization);
+              window.sessionStorage.setItem('menu',JSON.stringify(response.data.data));
+              this.$store.commit('menuSave', response.data.data)
               // this.$store.commit('userNameSave', )
               this.$message({
                 message:'登录成功',
                 type:'success'
               })
-              router.push({name:'information'})
+              router.push({name:'info'})
             }else{
               this.$message({
                 message:'帐号或密码错误',
