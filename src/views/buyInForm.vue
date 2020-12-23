@@ -26,7 +26,7 @@
     </el-form-item>
   </el-form>
     <el-table
-        :data="tableData">
+        :data="orderApply.orderLists">
       <el-table-column
           type="index"
           width="50"
@@ -184,6 +184,9 @@ export default {
   name: "buyInForm",
   components:{
     navbar
+  },
+  created() {
+    this.orderApply.orderLists = this.tableData
   },
   data() {
     return {

@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div >
     <el-menu
+        style="position: fixed;width: 100%;height: 60px;z-index: 9"
         :unique-opened="true"
         @select="handleSelect"
         :default-active="activeIndex"
         class="el-menu-demo"
-        mode="horizontal"
-    >
+        mode="horizontal">
       <el-submenu v-for="(item, index) in menu"
                   :key="index" :index="item.name">
         <template slot="title">

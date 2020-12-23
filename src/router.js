@@ -3,9 +3,10 @@ import Vue from "vue"
 
 import login from './views/login'
 import information from "./views/information";
-import buyInForm from "@/views/buyInForm";
 import listOrder from "@/views/listOrder";
 import addUser from "@/views/addUser";
+import addOrder from "@/views/addOrder";
+import orderDetail from "@/views/orderDetail";
 
 Vue.use(VueRouter)
 
@@ -34,13 +35,18 @@ const router = new VueRouter({
         },
         {
             path: '/addOrder',
-            name:'buyInForm',
-            component: buyInForm
+            name:'addOrder',
+            component: addOrder
         },
         {
             path: '/listOrder',
-            name: listOrder,
+            name: 'listOrder',
             component: listOrder
+        },
+        {
+            path: '/orderDetail',
+            name: 'orderDetail',
+            component: orderDetail
         }
 
     ]

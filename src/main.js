@@ -6,11 +6,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 import Vuex from 'vuex'
 import store  from './store'
 import axios from 'axios'
+import {getAxios} from "@/store/api";
 
 Vue.use(Vuex)
 Vue.use(ElementUI)
 Vue.prototype.$axios = axios
+Vue.prototype.$getAxios = getAxios
 axios.defaults.baseURL = 'http://localhost:8080'
+// axios.defaults.baseURL = 'http://192.168.50.35:8080'
 
 new Vue({
   router,
