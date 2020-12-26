@@ -51,13 +51,13 @@
           width="240">
       </el-table-column>
       <el-table-column
-          prop="quantity"
-          label="数量"
+          prop="unit"
+          label="单位"
           width="80">
       </el-table-column>
       <el-table-column
-          prop="unit"
-          label="单位"
+          prop="quantity"
+          label="数量"
           width="80">
       </el-table-column>
       <el-table-column
@@ -122,11 +122,11 @@
         <el-form-item label="配置或技术参数" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="5" v-model="form.configuration" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="数量" :label-width="formLabelWidth">
-          <el-input type="number" v-model="form.quantity" placeholder="请输入数字"  autocomplete="off"></el-input>
-        </el-form-item>
         <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
           <el-input v-model="form.unit" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="数量" :label-width="formLabelWidth">
+          <el-input type="number" v-model="form.quantity" placeholder="请输入数字"  autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
           <el-input type="number" v-model="form.budgetUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
@@ -158,11 +158,11 @@
         <el-form-item label="配置或技术参数" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="5" v-model="newForm.configuration" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="数量" :label-width="formLabelWidth">
-          <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
-        </el-form-item>
         <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
           <el-input v-model="newForm.unit" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="数量" :label-width="formLabelWidth">
+          <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
         </el-form-item>
         <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
           <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
