@@ -90,7 +90,6 @@ export default {
   },
   methods:{
     handleDelete(index,row){
-      console.log(index,row.id)
       this.$getAxios(true).delete('/order/'+row.id).then((res)=>{
         if (res.data.success){
           this.orderApplies.splice(index,1)
@@ -113,14 +112,12 @@ export default {
        router.push({path:'/orderDetail',query:{order:this.orderApplies[index]}})
     },
     currentChange(current){
-      console.log('current',current)
       this.$getAxios(true).get('/order/orders',{
         params:{
           id:sessionStorage.getItem('username'),
           page:current
         }
       }).then((res)=>{
-        console.log('current success',res.data.data.content);
         this.orderApplies = res.data.data.content;
       })
     }
@@ -134,7 +131,6 @@ export default {
       }
     }).then((res)=>{
       if(res.data.success){
-        console.log(res.data.data.content)
         this.orderApplies = res.data.data.content;
         this.total = res.data.data.totalElements;
         this.page = res.data.data.number+1;

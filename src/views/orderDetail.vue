@@ -6,22 +6,21 @@
     <el-form :inline="true" class="demo-form-inline" :model="orderApply">
       <el-form-item label="编号:">{{orderApply.id}}
       </el-form-item>
-      <el-form-item label="申请部门">
-        <el-input style="width: 10vw;" placeholder="申请部门" v-model="orderApply.applyDepartment"></el-input>
-      </el-form-item>
-      <el-form-item label="申请人">
-        <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
-      </el-form-item>
       <el-form-item label="采购经费代码:">
         {{orderApply.fundCode}}
       </el-form-item>
       <el-form-item label="申请日期：">
         {{orderApply.applyDate}}
       </el-form-item>
+      <el-form-item label="申请部门">
+        <el-input style="width: 10vw;" placeholder="申请部门" v-model="orderApply.applyDepartment"></el-input>
+      </el-form-item>
+      <el-form-item label="申请人">
+        <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
+      </el-form-item>
         <el-form-item label="采购总金额">
           <el-input type="number" style="width: 10vw" placeholder="采购总金额" v-model="orderApply.total"></el-input>
         </el-form-item>
-
     </el-form>
     <el-table
         :data="orderApply.orderLists">
@@ -54,6 +53,11 @@
       <el-table-column
           prop="quantity"
           label="数量"
+          width="80">
+      </el-table-column>
+      <el-table-column
+          prop="unit"
+          label="单位"
           width="80">
       </el-table-column>
       <el-table-column
@@ -121,6 +125,9 @@
         <el-form-item label="数量" :label-width="formLabelWidth">
           <el-input type="number" v-model="form.quantity" placeholder="请输入数字"  autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
+          <el-input v-model="form.unit" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
           <el-input type="number" v-model="form.budgetUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
         </el-form-item>
@@ -152,10 +159,13 @@
           <el-input type="textarea" :rows="5" v-model="newForm.configuration" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="数量" :label-width="formLabelWidth">
-          <el-input type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input>
+          <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
+        </el-form-item>
+        <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
+          <el-input v-model="newForm.unit" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
-          <el-input type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input>
+          <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
         </el-form-item>
         <el-form-item label="预算总价" :label-width="formLabelWidth">
           {{itemTotal}}
@@ -230,6 +240,7 @@ export default {
         type:'',
         configuration:'',
         quantity:'',
+        unit:'',
         budgetUnitPrice:'',
         budgetTotalPrice:'',
         reason:'',
@@ -244,6 +255,7 @@ export default {
         type:'',
         configuration:'',
         quantity:'',
+        unit:'',
         budgetUnitPrice:'',
         budgetTotalPrice:'',
         reason:'',
@@ -254,7 +266,42 @@ export default {
   },
 
   methods: {
-    print(){},
+    print(){
+      //下载 Excel 文件
+      this.$axios
+          .get("/order/file", {
+            params: {
+              id: this.orderApply.id,
+            },
+            responseType: "blob",   //文件下载的 url 需要带上这个参数
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((res) => {
+            console.log(res);
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+            );   //根据返回头的content-disposition字段中的参数决定文件名
+            //content-type 决定文件类型
+            const blob = new Blob([data], { type: headers["content-type"] });
+            //下载文件方式：在 html 中插入一个不可见的 a 标签，将返回的文件连接到 a 标签上实现下载
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    },
     addItem(){
       this.newDialogVisible = true;
     },

@@ -75,10 +75,7 @@ export default {
               username:this.form.username,
               password: this.form.password
             }).then(response=>{
-            console.log('response',response);
             if(response.data.success===true){
-              // console.log('header',response.headers.authorization)
-              // console.log('header',JSON.stringify(response.data.data))
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
               this.$store.commit('menuSave', response.data.data)
