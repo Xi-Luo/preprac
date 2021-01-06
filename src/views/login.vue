@@ -87,7 +87,7 @@ export default {
                 message:'登录成功',
                 type:'success'
               })
-              router.push({name:'info'})
+              router.push({name:'listOrder'})
             }else{
               this.$message({
                 message:'帐号或密码错误',

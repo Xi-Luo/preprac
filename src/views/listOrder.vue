@@ -5,7 +5,8 @@
   <div style="display: table;margin: 0 auto;padding-top: 65px">
   <el-table
       :data="orderApplies"
-      border>
+      border
+      v-loading="isLoading">
     <el-table-column
         prop="id"
         label="编号"
@@ -73,6 +74,7 @@ export default {
   },
   data(){
     return{
+      isLoading: true,
       page:1,
       pageSize:2,
       total:0,
@@ -135,6 +137,7 @@ export default {
         this.total = res.data.data.totalElements;
         this.page = res.data.data.number+1;
         this.pageSize = res.data.data.pageSize;
+        this.isLoading = false
       } else{
         this.$message(
             {

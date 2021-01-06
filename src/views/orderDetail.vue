@@ -13,13 +13,21 @@
         {{orderApply.applyDate}}
       </el-form-item>
       <el-form-item label="申请部门">
-        <el-input style="width: 10vw;" placeholder="申请部门" v-model="orderApply.applyDepartment"></el-input>
+        <el-select v-model="orderApply.applyDepartment" placeholder="请选择">
+          <el-option
+              v-for="item in departmentOptions"
+              :key="item.id"
+              :label="item.deptName"
+              :value="item.deptName">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="申请人">
         <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
       </el-form-item>
         <el-form-item label="采购总金额">
-          <el-input type="number" style="width: 10vw" placeholder="采购总金额" v-model="orderApply.total"></el-input>
+          {{orderApply.total}}
+<!--          <el-input type="number" style="width: 10vw" placeholder="采购总金额" v-model="orderApply.total"></el-input>-->
         </el-form-item>
     </el-form>
     <el-table
@@ -95,11 +103,22 @@
         </template>
       </el-table-column>
     </el-table>
+      <el-upload
+          class="upload-demo"
+          ref="upload"
+          action="http://localhost:8080/order/file"
+          :on-preview="handlePreview"
+          :on-remove="handleRemove"
+          :file-list="fileList"
+          :auto-upload="false">
+        <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
     <el-form :inline="true" style="float: right" class="form">
       <el-form-item>
         <el-button  @click="addItem">添加物资条款</el-button>
       </el-form-item>
-
       <el-form-item>
         <el-button type="success" plain style="float: right" @click="print">打印</el-button>
       </el-form-item>
@@ -196,17 +215,16 @@ export default {
   },
   created() {
     this.orderApply = this.$route.query.order
-    console.log('route', this.$route.query.order)
+    this.initData()
   },
   computed:{
     itemTotal:function (){
-      console.log('this is computed get')
       if(this.newFormUnitPrice&&this.newFormQuantity){
         return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
       }else{
         return 0;
       }
-    },
+    }
   },
   watch:{
     itemTotal(){
@@ -221,6 +239,10 @@ export default {
   },
   data() {
     return {
+      departmentOptions:[
+        {id:'1',
+          deptName:'测试1'}
+      ],
       newFormQuantity:'',
       newFormUnitPrice:'',
       dialogFormVisible: false,
@@ -266,6 +288,13 @@ export default {
   },
 
   methods: {
+    initData () {
+      // 获取部门列表
+      this.$getAxios(true).get('/department/departments')
+          .then((res)=>{
+            this.departmentOptions = res.data.data
+          })
+    },
     print(){
       //下载 Excel 文件
       this.$axios

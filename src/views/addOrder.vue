@@ -99,7 +99,7 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button @click="saveOrder" type="primary" plain style="float: right">保存</el-button>
+            <el-button @click="saveOrder" type="primary" plain style="float: right">提交</el-button>
           </el-form-item>
 <!--          <el-form-item>-->
 <!--            <el-button type="primary" @click="addItem" style="float: right">提交</el-button>-->
@@ -157,13 +157,14 @@
               <el-input v-model="newForm.unit" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item prop="quantity" label="数量" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" type="number" v-model="newForm.quantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
+              <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
             </el-form-item>
             <el-form-item prop="budgetUnitPrice" label="预算单价(元)" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" type="number" v-model="newForm.budgetUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
+              <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
             </el-form-item>
             <el-form-item prop="budgetTotalPrice" label="预算总价" :label-width="formLabelWidth">
-              <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>
+              {{itemTotal}}
+<!--              <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>-->
             </el-form-item>
             <el-form-item prop="reason" label="原因" :label-width="formLabelWidth">
               <el-input type="textarea" :rows="5" v-model="newForm.reason" autocomplete="off"></el-input>
@@ -190,18 +191,35 @@ export default {
     navbar
   },
   created() {
-    this.getDepartments()
+    this.init()
+  },
+  computed:{
+    itemTotal:function (){
+      if(this.newFormUnitPrice&&this.newFormQuantity){
+        return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
+      }else{
+        return 0;
+      }
+    }
+  },
+  watch:{
+    itemTotal(){
+      this.newForm.budgetTotalPrice = this.itemTotal
+    },
+    newFormQuantity(){
+      this.newForm.quantity = this.newFormQuantity
+    },
+    newFormUnitPrice(){
+      this.newForm.budgetUnitPrice = this.newFormUnitPrice
+    }
   },
   data() {
     return {
-      value:'',
+      newFormQuantity:'',
+      newFormUnitPrice:'',
       departmentOptions:[
         {id:'1',
-        deptName:'测试1'},
-        {
-          id: '2',
-          deptName: '测试二'
-        }
+        deptName:'测试1'}
       ],
       dialogFormVisible: false,
       formLabelWidth: '120px',
@@ -210,7 +228,8 @@ export default {
         applyUser:'',
         fundCode:'',
         total:0,
-        orderLists:[]
+        orderLists:[],
+        uid:''
       },
       form:{
         no:'',
@@ -239,123 +258,70 @@ export default {
         reason:'',
         newUser:'',
         old:''
-      },
-      tableData: [
-        {
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        },{
-          id:1,
-          name: '王小虎',
-          type: '上海',
-          configuration: '普陀区',
-          unit: '上海市',
-          quantity: 30,
-          budgetUnitPrice:100,
-          budgetTotalPrice:3000,
-          reason:'旧设备毁坏',
-          newUser:'小王',
-          old:'毁坏'
-        }]
+      }
     }
   },
   methods: {
-    getDepartments(){
+    init(){
       this.$getAxios(true).get('/department/departments')
           .then((res)=>{
             this.departmentOptions = res.data.data
           })
-
+      this.orderApply.uid = this.$store.state.userName
     },
     addNewItem() {
       let tmp = {}
       for(let key in this.newForm){
         tmp[key] = this.newForm[key]
       }
+      tmp.no = this.orderApply.orderLists.length
       this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+      if (this.newForm.budgetUnitPrice>=300000){
+        this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.downloadFile()
+        }).catch();
+      }
       this.orderApply.orderLists.push(tmp)
       this.newDialogVisible = false
+    },
+    downloadFile(){
+      this.$axios
+          .get("/order/download", {
+            params: {
+              id: this.orderApply.id,
+            },
+            responseType: "blob",   //文件下载的 url 需要带上这个参数
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((res) => {
+            console.log(res);
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+            );   //根据返回头的content-disposition字段中的参数决定文件名
+            //content-type 决定文件类型
+            const blob = new Blob([data], { type: headers["content-type"] });
+            //下载文件方式：在 html 中插入一个不可见的 a 标签，将返回的文件连接到 a 标签上实现下载
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     },
     async saveOrder(){
       await console.log('addorder',this.orderApply)
@@ -371,10 +337,19 @@ export default {
       })
     },
     addItem(formName){
-      this.newDialogVisible = true;
-      this.$nextTick(() => {
-        this.$refs[formName].resetFields()
-      })
+      if(this.orderApply.orderLists.length>=6){
+        this.$message({
+          type:'warning',
+          message:'申请单条款数已达上限'
+        })
+      } else {
+        this.newDialogVisible = true;
+        this.$nextTick(() => {
+          this.$refs[formName].resetFields()
+          this.newFormQuantity = ''
+          this.newFormUnitPrice = ''
+        })
+      }
     },
     handleEdit(index,row){
       this.dialogFormVisible = true;
@@ -384,8 +359,7 @@ export default {
       this.dialogFormVisible = false
     },
     handleDelete(index) {
-      this.tableData.splice(index,1);
-      console.log('delete',index)
+      this.orderApply.orderLists.splice(index,1);
     }
   },
 
