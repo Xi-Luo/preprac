@@ -92,23 +92,29 @@ export default {
   },
   methods:{
     handleDelete(index,row){
-      this.$getAxios(true).delete('/order/'+row.id).then((res)=>{
-        if (res.data.success){
-          this.orderApplies.splice(index,1)
-          this.$message(
-              {
-                message:'删除成功',
-                type:"success"
-              })
-        }else {
-          this.$message(
-              {
-                message:'删除失败',
-                type:"error"
-              }
-          )
-        }
-      })
+      this.$confirm('确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$getAxios(true).delete('/order/'+row.id).then((res)=>{
+          if (res.data.success){
+            this.orderApplies.splice(index,1)
+            this.$message(
+                {
+                  message:'删除成功',
+                  type:"success"
+                })
+          }else {
+            this.$message(
+                {
+                  message:'删除失败',
+                  type:"error"
+                }
+            )
+          }
+        })
+      }).catch();
     },
     handleClick(index){
        router.push({path:'/orderDetail',query:{order:this.orderApplies[index]}})

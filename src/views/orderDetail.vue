@@ -103,27 +103,30 @@
         </template>
       </el-table-column>
     </el-table>
-      <el-upload
-          class="upload-demo"
-          ref="upload"
-          action="http://localhost:8080/order/file"
-          :on-preview="handlePreview"
-          :on-remove="handleRemove"
-          :file-list="fileList"
-          :auto-upload="false">
-        <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
+<!--      <el-upload-->
+<!--          class="upload-demo"-->
+<!--          action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--          :on-preview="handlePreview"-->
+<!--          :on-remove="handleRemove"-->
+<!--          :before-remove="beforeRemove"-->
+<!--          multiple-->
+<!--          :limit="1"-->
+<!--          :on-exceed="handleExceed"-->
+<!--          :file-list="fileList"-->
+<!--          style="margin-left: 10px"-->
+<!--      >-->
+<!--        <el-button size="small" type="primary">点击上传签名图片</el-button>-->
+<!--        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+<!--      </el-upload>-->
     <el-form :inline="true" style="float: right" class="form">
       <el-form-item>
-        <el-button  @click="addItem">添加物资条款</el-button>
+        <el-button  @click="addItem('newForm')">添加物资条款</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="success" plain style="float: right" @click="print">打印</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain style="float: right">保存</el-button>
+        <el-button type="primary" plain style="float: right" @click="save">保存</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="addItem" style="float: right">提交</el-button>
@@ -145,13 +148,14 @@
           <el-input v-model="form.unit" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="数量" :label-width="formLabelWidth">
-          <el-input type="number" v-model="form.quantity" placeholder="请输入数字"  autocomplete="off"></el-input>
+          <el-input-number controls-position="right" v-model="formQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
         </el-form-item>
         <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
-          <el-input type="number" v-model="form.budgetUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
+          <el-input-number controls-position="right" v-model="formUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input-number>
         </el-form-item>
         <el-form-item label="预算总价" :label-width="formLabelWidth">
-          <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
+          {{ formTotal }}
+<!--          <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>-->
         </el-form-item>
         <el-form-item label="原因" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
@@ -167,39 +171,39 @@
     </el-dialog>
 
     <el-dialog title="添加资产" :visible.sync="newDialogVisible">
-      <el-form :model="newForm">
-        <el-form-item label="物资名称" :label-width="formLabelWidth">
+      <el-form ref="newForm" :model="newForm">
+        <el-form-item prop="name" label="物资名称" :label-width="formLabelWidth">
           <el-input v-model="newForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="品牌型号" :label-width="formLabelWidth">
+        <el-form-item prop="type" label="品牌型号" :label-width="formLabelWidth">
           <el-input v-model="newForm.type" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="配置或技术参数" :label-width="formLabelWidth">
+        <el-form-item prop="configuration" label="配置或技术参数" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="5" v-model="newForm.configuration" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
           <el-input v-model="newForm.unit" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="数量" :label-width="formLabelWidth">
+        <el-form-item prop="quantity" label="数量" :label-width="formLabelWidth">
           <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
         </el-form-item>
-        <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
+        <el-form-item prop="budgetUnitPrice" label="预算单价(元)" :label-width="formLabelWidth">
           <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
         </el-form-item>
-        <el-form-item label="预算总价" :label-width="formLabelWidth">
+        <el-form-item prop="budgetTotalPrice" label="预算总价" :label-width="formLabelWidth">
           {{itemTotal}}
 <!--          <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>-->
         </el-form-item>
-        <el-form-item label="原因" :label-width="formLabelWidth">
+        <el-form-item prop="reason" label="原因" :label-width="formLabelWidth">
           <el-input type="textarea" :rows="5" v-model="newForm.reason" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="新设备使用人" :label-width="formLabelWidth">
+        <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
           <el-input v-model="newForm.newUser" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="newDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="newDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addNewItem">确 定</el-button>
       </div>
     </el-dialog>
     </div>
@@ -218,6 +222,13 @@ export default {
     this.initData()
   },
   computed:{
+    formTotal:function () {
+      if (this.formQuantity && this.formUnitPrice) {
+        return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
+      } else {
+        return 0
+      }
+    },
     itemTotal:function (){
       if(this.newFormUnitPrice&&this.newFormQuantity){
         return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
@@ -235,14 +246,27 @@ export default {
     },
     newFormUnitPrice(){
       this.newForm.budgetUnitPrice = this.newFormUnitPrice
+    },
+    formQuantity(){
+      this.form.quantity = this.formQuantity
+    },
+    formUnitPrice(){
+      this.form.budgetUnitPrice = this.formUnitPrice
+    },
+    formTotal(){
+      this.orderApply.total = this.orderApply.total-this.form.budgetTotalPrice + this.formTotal
+      this.form.budgetTotalPrice = this.formTotal
     }
   },
   data() {
     return {
+      formQuantity:0,
+      formUnitPrice:0,
       departmentOptions:[
         {id:'1',
           deptName:'测试1'}
       ],
+      fileList: [],
       newFormQuantity:'',
       newFormUnitPrice:'',
       dialogFormVisible: false,
@@ -254,7 +278,8 @@ export default {
         fundCode:'',
         applyDate:'',
         total:'',
-        orderLists:[]
+        orderLists:[],
+        uid:''
       },
       form:{
         no:'',
@@ -294,6 +319,75 @@ export default {
           .then((res)=>{
             this.departmentOptions = res.data.data
           })
+      this.orderApply.uid = this.$store.state.userName
+    },
+    addNewItem () {
+      let tmp = {}
+      for(let key in this.newForm){
+        tmp[key] = this.newForm[key]
+      }
+      tmp.no = this.orderApply.orderLists.length
+      this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+      if (this.newForm.budgetUnitPrice>=300000){
+        this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.downloadFile()
+          this.orderApply.orderLists.push(tmp)
+          this.newDialogVisible = false
+        }).catch();
+      } else {
+        this.orderApply.orderLists.push(tmp)
+        this.newDialogVisible = false
+      }
+    },
+    downloadFile(){
+      this.$axios
+          .get("/order/download", {
+            params: {
+              id: this.orderApply.id,
+            },
+            responseType: "blob",   //文件下载的 url 需要带上这个参数
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((res) => {
+            console.log(res);
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+            );   //根据返回头的content-disposition字段中的参数决定文件名
+            //content-type 决定文件类型
+            const blob = new Blob([data], { type: headers["content-type"] });
+            //下载文件方式：在 html 中插入一个不可见的 a 标签，将返回的文件连接到 a 标签上实现下载
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    },
+    save () {
+      this.$getAxios(true).put('/order',this.orderApply).then(res=>{
+        console.log('res',res.data)
+        if (res.data.success) {
+          this.$message({
+            type: 'success',
+            message: '保存成功'
+          })
+        }
+      })
     },
     print(){
       //下载 Excel 文件
@@ -331,23 +425,47 @@ export default {
             console.log(err);
           });
     },
-    addItem(){
-      this.newDialogVisible = true;
+    addItem(formName){
+      if(this.orderApply.orderLists.length>=6){
+        this.$message({
+          type:'warning',
+          message:'申请单条款数已达上限'
+        })
+      } else {
+        this.newDialogVisible = true;
+        this.$nextTick(() => {
+          this.$refs[formName].resetFields()
+          this.newFormQuantity = ''
+          this.newFormUnitPrice = ''
+        })
+      }
     },
     handleEdit(index,row){
       this.dialogFormVisible = true;
       this.form = row;
+      this.formTotal = this.form.budgetTotalPrice
+      this.formQuantity = this.form.quantity
+      this.formUnitPrice = this.form.budgetUnitPrice
     },
     editConfirm(){
-      this.dialogFormVisible = false
+      if (this.form.budgetUnitPrice>=300000){
+        this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.downloadFile()
+          this.dialogFormVisible = false
+        }).catch();
+      } else {
+        this.dialogFormVisible = false
+      }
     },
     handleDelete(index) {
       this.tableData.splice(index,1);
       console.log('delete',index)
     }
-  },
-
-
+  }
 }
 </script>
 

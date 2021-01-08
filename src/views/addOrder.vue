@@ -97,9 +97,8 @@
           <el-form-item>
             <el-button  @click="addItem('newForm')">添加物资条款</el-button>
           </el-form-item>
-
           <el-form-item>
-            <el-button @click="saveOrder" type="primary" plain style="float: right">提交</el-button>
+            <el-button @click="saveOrder" type="primary" plain style="float: right">保存</el-button>
           </el-form-item>
 <!--          <el-form-item>-->
 <!--            <el-button type="primary" @click="addItem" style="float: right">提交</el-button>-->
@@ -121,13 +120,14 @@
               <el-input v-model="form.unit" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="数量" :label-width="formLabelWidth">
-              <el-input type="number" v-model="form.quantity" placeholder="请输入数字"  autocomplete="off"></el-input>
+              <el-input-number controls-position="right" v-model="formQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
             </el-form-item>
             <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
-              <el-input type="number" v-model="form.budgetUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
+              <el-input-number controls-position="right" v-model="formUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input-number>
             </el-form-item>
             <el-form-item label="预算总价" :label-width="formLabelWidth">
-              <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>
+              {{ formTotal }}
+<!--              <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>-->
             </el-form-item>
             <el-form-item label="原因" :label-width="formLabelWidth">
               <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
@@ -194,11 +194,18 @@ export default {
     this.init()
   },
   computed:{
+    formTotal:function () {
+      if (this.formQuantity && this.formUnitPrice) {
+        return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
+      } else {
+        return 0
+      }
+    },
     itemTotal:function (){
       if(this.newFormUnitPrice&&this.newFormQuantity){
         return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
       }else{
-        return 0;
+        return 0
       }
     }
   },
@@ -211,10 +218,23 @@ export default {
     },
     newFormUnitPrice(){
       this.newForm.budgetUnitPrice = this.newFormUnitPrice
+    },
+    formQuantity(){
+      this.form.quantity = this.formQuantity
+    },
+    formUnitPrice(){
+      this.form.budgetUnitPrice = this.formUnitPrice
+    },
+    formTotal(){
+      this.orderApply.total = this.orderApply.total-this.form.budgetTotalPrice + this.formTotal
+      this.form.budgetTotalPrice = this.formTotal
     }
+
   },
   data() {
     return {
+      formQuantity:'',
+      formUnitPrice:'',
       newFormQuantity:'',
       newFormUnitPrice:'',
       departmentOptions:[
@@ -323,8 +343,7 @@ export default {
             console.log(err);
           });
     },
-    async saveOrder(){
-      await console.log('addorder',this.orderApply)
+    saveOrder(){
       this.$getAxios(true).post('/order',this.orderApply
       ).then((res)=>{
         console.log(res.data.data)
@@ -354,8 +373,25 @@ export default {
     handleEdit(index,row){
       this.dialogFormVisible = true;
       this.form = row;
+      this.formQuantity = this.form.quantity
+      this.formUnitPrice = this.form.budgetUnitPrice
     },
     editConfirm(){
+      if (this.form.budgetUnitPrice>=300000){
+        this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.downloadFile()
+        }).catch();
+      }
+      //计算表单总价
+      console.log('orderlist',this.orderApply.orderLists)
+      // let sum = 0
+      // for (let item in this.orderApply.orderLists) {
+      //
+      // }
       this.dialogFormVisible = false
     },
     handleDelete(index) {
