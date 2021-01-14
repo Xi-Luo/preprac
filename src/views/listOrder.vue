@@ -38,6 +38,11 @@
         width="120">
     </el-table-column>
     <el-table-column
+        prop="status0"
+        label="状态"
+        width="120">
+    </el-table-column>
+    <el-table-column
         label="操作"
         width="100">
       <template slot-scope="scope">
@@ -140,11 +145,19 @@ export default {
     }).then((res)=>{
       if(res.data.success){
         this.orderApplies = res.data.data.content;
+        for(let i = 0; i <this.orderApplies.length;i++){
+          if(this.orderApplies[i].status===0) {
+            this.orderApplies[i].status0 = '已保存'
+          } else if (this.orderApplies[i].status ===1) {
+            this.orderApplies[i].status0 = '已提交'
+          }
+        }
         this.total = res.data.data.totalElements;
         this.page = res.data.data.number+1;
         this.pageSize = res.data.data.pageSize;
         this.isLoading = false
       } else{
+        this.isLoading = false
         this.$message(
             {
               message:'获取失败',

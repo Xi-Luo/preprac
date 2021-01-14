@@ -98,14 +98,14 @@
             <el-button  @click="addItem('newForm')">添加物资条款</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button @click="saveOrder" type="primary" plain style="float: right">保存</el-button>
+            <el-button @click="saveOrder" type="primary" >保存</el-button>
           </el-form-item>
 <!--          <el-form-item>-->
 <!--            <el-button type="primary" @click="addItem" style="float: right">提交</el-button>-->
 <!--          </el-form-item>-->
         </el-form>
 
-        <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+        <el-dialog title="编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="editClose">
           <el-form :model="form">
             <el-form-item label="物资名称" :label-width="formLabelWidth">
               <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -136,10 +136,10 @@
               <el-input v-model="form.newUser" autocomplete="off"></el-input>
             </el-form-item>
           </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="editConfirm">确 定</el-button>
-          </div>
+<!--          <div slot="footer" class="dialog-footer">-->
+<!--            <el-button @click="dialogFormVisible = false">取 消</el-button>-->
+<!--            <el-button type="primary" @click="editConfirm">确 定</el-button>-->
+<!--          </div>-->
         </el-dialog>
 
         <el-dialog title="添加资产" :visible.sync="newDialogVisible">
@@ -194,19 +194,25 @@ export default {
     this.init()
   },
   computed:{
-    formTotal:function () {
-      if (this.formQuantity && this.formUnitPrice) {
-        return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
-      } else {
-        return 0
-      }
+    formTotal:{
+      get(){
+        if (this.formQuantity && this.formUnitPrice) {
+          return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
+        } else {
+          return 0
+        }
+      },
+      set(){}
     },
-    itemTotal:function (){
-      if(this.newFormUnitPrice&&this.newFormQuantity){
-        return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
-      }else{
-        return 0
-      }
+    itemTotal:{
+      get(){
+        if(this.newFormUnitPrice&&this.newFormQuantity){
+          return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
+        }else{
+          return 0
+        }
+      },
+      set(){}
     }
   },
   watch:{
@@ -252,7 +258,6 @@ export default {
         uid:''
       },
       form:{
-        no:'',
         name:'',
         type:'',
         configuration:'',
@@ -267,7 +272,6 @@ export default {
       newDialogVisible:false,
 
       newForm:{
-        no:'',
         name:'',
         type:'',
         configuration:'',
@@ -282,6 +286,11 @@ export default {
     }
   },
   methods: {
+    editClose(){
+      if (this.formUnitPrice>=300000) {
+        this.editConfirm()
+      }
+    },
     init(){
       this.$getAxios(true).get('/department/departments')
           .then((res)=>{
@@ -294,8 +303,7 @@ export default {
       for(let key in this.newForm){
         tmp[key] = this.newForm[key]
       }
-      tmp.no = this.orderApply.orderLists.length
-      this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+
       if (this.newForm.budgetUnitPrice>=300000){
         this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
           confirmButtonText: '确定',
@@ -303,10 +311,16 @@ export default {
           type: 'warning'
         }).then(() => {
           this.downloadFile()
-        }).catch();
+          this.orderApply.orderLists.push(tmp)
+          this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+          this.newDialogVisible = false
+        }).catch((err)=>{ console.log(err)});
+      }else {
+        this.orderApply.orderLists.push(tmp)
+        this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+        this.newDialogVisible = false
       }
-      this.orderApply.orderLists.push(tmp)
-      this.newDialogVisible = false
+
     },
     downloadFile(){
       this.$axios
@@ -377,22 +391,19 @@ export default {
       this.formUnitPrice = this.form.budgetUnitPrice
     },
     editConfirm(){
-      if (this.form.budgetUnitPrice>=300000){
+      if (this.formUnitPrice>=300000){
         this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.downloadFile()
+          this.form.budgetUnitPrice = this.formUnitPrice
+          this.dialogFormVisible = false
         }).catch();
+      } else {
+        this.dialogFormVisible = false
       }
-      //计算表单总价
-      console.log('orderlist',this.orderApply.orderLists)
-      // let sum = 0
-      // for (let item in this.orderApply.orderLists) {
-      //
-      // }
-      this.dialogFormVisible = false
     },
     handleDelete(index) {
       this.orderApply.orderLists.splice(index,1);

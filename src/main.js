@@ -13,7 +13,7 @@ Vue.use(ElementUI)
 Vue.prototype.$axios = axios
 Vue.prototype.$getAxios = getAxios
 axios.defaults.baseURL = 'http://localhost:8080'
-// axios.defaults.baseURL = 'http://192.168.50.35:8080'
+// axios.defaults.baseURL = 'http://10.255.17.76:8080'
 
 new Vue({
   router,

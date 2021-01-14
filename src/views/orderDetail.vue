@@ -103,22 +103,22 @@
         </template>
       </el-table-column>
     </el-table>
-<!--      <el-upload-->
-<!--          class="upload-demo"-->
-<!--          action="https://jsonplaceholder.typicode.com/posts/"-->
-<!--          :on-preview="handlePreview"-->
-<!--          :on-remove="handleRemove"-->
-<!--          :before-remove="beforeRemove"-->
-<!--          multiple-->
-<!--          :limit="1"-->
-<!--          :on-exceed="handleExceed"-->
-<!--          :file-list="fileList"-->
-<!--          style="margin-left: 10px"-->
-<!--      >-->
-<!--        <el-button size="small" type="primary">点击上传签名图片</el-button>-->
-<!--        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-<!--      </el-upload>-->
+      <div style="width: 300px">
+        <el-upload
+            class="upload-demo"
+            action="http://localhost:8080/order/file"
+            :headers="{ Authorization: this.$store.state.token }"
+            :data="{ id: this.orderApply.id }"
+            :before-upload="beforeUpload"
+        >
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div class="el-upload__tip" slot="tip">
+            只能上传 jpg/png 图片，且大小不能超过5MB
+          </div>
+        </el-upload>
+      </div>
     <el-form :inline="true" style="float: right" class="form">
+
       <el-form-item>
         <el-button  @click="addItem('newForm')">添加物资条款</el-button>
       </el-form-item>
@@ -126,14 +126,11 @@
         <el-button type="success" plain style="float: right" @click="print">打印</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain style="float: right" @click="save">保存</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="addItem" style="float: right">提交</el-button>
+        <el-button type="primary" @click="save" style="float: right">提交</el-button>
       </el-form-item>
     </el-form>
 
-    <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+    <el-dialog title="编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="editClose">
       <el-form :model="form">
         <el-form-item label="物资名称" :label-width="formLabelWidth">
           <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -164,10 +161,10 @@
           <el-input v-model="form.newUser" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editConfirm">确 定</el-button>
-      </div>
+<!--      <div slot="footer" class="dialog-footer">-->
+<!--        <el-button @click="dialogFormVisible = false">取 消</el-button>-->
+<!--        <el-button type="primary" @click="editConfirm">确 定</el-button>-->
+<!--      </div>-->
     </el-dialog>
 
     <el-dialog title="添加资产" :visible.sync="newDialogVisible">
@@ -222,19 +219,25 @@ export default {
     this.initData()
   },
   computed:{
-    formTotal:function () {
-      if (this.formQuantity && this.formUnitPrice) {
-        return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
-      } else {
-        return 0
-      }
+    formTotal:{
+      get(){
+        if (this.formQuantity && this.formUnitPrice) {
+          return parseFloat(this.formQuantity)*parseFloat(this.formUnitPrice)
+        } else {
+          return 0
+        }
+      },
+      set(){}
     },
-    itemTotal:function (){
-      if(this.newFormUnitPrice&&this.newFormQuantity){
-        return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
-      }else{
-        return 0;
-      }
+    itemTotal:{
+      get(){
+        if(this.newFormUnitPrice&&this.newFormQuantity){
+          return parseFloat(this.newFormQuantity)*parseFloat(this.newFormUnitPrice)
+        }else{
+          return 0;
+        }
+      },
+      set() {}
     }
   },
   watch:{
@@ -252,6 +255,9 @@ export default {
     },
     formUnitPrice(){
       this.form.budgetUnitPrice = this.formUnitPrice
+      if (this.formUnitPrice>=300000) {
+        this.editConfirm()
+      }
     },
     formTotal(){
       this.orderApply.total = this.orderApply.total-this.form.budgetTotalPrice + this.formTotal
@@ -279,10 +285,10 @@ export default {
         applyDate:'',
         total:'',
         orderLists:[],
-        uid:''
+        uid:'',
+        status: 0
       },
       form:{
-        no:'',
         name:'',
         type:'',
         configuration:'',
@@ -297,7 +303,6 @@ export default {
       newDialogVisible:false,
 
       newForm:{
-        no:'',
         name:'',
         type:'',
         configuration:'',
@@ -313,6 +318,11 @@ export default {
   },
 
   methods: {
+    editClose(){
+      if (this.formUnitPrice>=300000) {
+        this.editConfirm()
+      }
+    },
     initData () {
       // 获取部门列表
       this.$getAxios(true).get('/department/departments')
@@ -326,8 +336,7 @@ export default {
       for(let key in this.newForm){
         tmp[key] = this.newForm[key]
       }
-      tmp.no = this.orderApply.orderLists.length
-      this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+
       if (this.newForm.budgetUnitPrice>=300000){
         this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
           confirmButtonText: '确定',
@@ -336,10 +345,14 @@ export default {
         }).then(() => {
           this.downloadFile()
           this.orderApply.orderLists.push(tmp)
+          this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+          console.log('here is then')
           this.newDialogVisible = false
-        }).catch();
+        }).catch(()=>{console.log('catch')});
       } else {
         this.orderApply.orderLists.push(tmp)
+        this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
+        console.log('here is else')
         this.newDialogVisible = false
       }
     },
@@ -448,7 +461,7 @@ export default {
       this.formUnitPrice = this.form.budgetUnitPrice
     },
     editConfirm(){
-      if (this.form.budgetUnitPrice>=300000){
+      if (this.formUnitPrice>=300000){
         this.$confirm('单价超过30万，即将下载可行性文件', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -456,14 +469,36 @@ export default {
         }).then(() => {
           this.downloadFile()
           this.dialogFormVisible = false
-        }).catch();
+        }).catch((err)=>{console.log(err)});
       } else {
         this.dialogFormVisible = false
       }
+
     },
     handleDelete(index) {
-      this.tableData.splice(index,1);
       console.log('delete',index)
+      this.$confirm('确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.orderApply.total = this.orderApply.total-this.orderApply.orderLists[index].budgetTotalPrice
+        this.orderApply.orderLists.splice(index,1)
+        this.$message.success('删除成功')
+      }).catch();
+
+
+    },
+    beforeUpload (file) {
+      const isJpgOrPng = (file.type === 'image/jpeg')||(file.type==='image/png')
+      const isLt5M = file.size / 1024 / 1024 < 5
+      if (!isJpgOrPng) {
+        this.$message.error('上传文件只能是jpg或png格式！')
+      }
+      if (!isLt5M) {
+        this.$message.error('上传文件大小不能超过5MB')
+      }
+      return isLt5M && isJpgOrPng
     }
   }
 }
