@@ -129,7 +129,7 @@
               {{ formTotal }}
 <!--              <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>-->
             </el-form-item>
-            <el-form-item label="原因" :label-width="formLabelWidth">
+            <el-form-item label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
               <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="新设备使用人" :label-width="formLabelWidth">
@@ -166,7 +166,7 @@
               {{itemTotal}}
 <!--              <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>-->
             </el-form-item>
-            <el-form-item prop="reason" label="原因" :label-width="formLabelWidth">
+            <el-form-item prop="reason" label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
               <el-input type="textarea" :rows="5" v-model="newForm.reason" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
@@ -248,7 +248,7 @@ export default {
         deptName:'测试1'}
       ],
       dialogFormVisible: false,
-      formLabelWidth: '120px',
+      formLabelWidth: '170px',
       orderApply:{
         applyDepartment:'',
         applyUser:'',

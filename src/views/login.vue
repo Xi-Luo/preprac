@@ -1,21 +1,26 @@
 <template>
-  <el-row :gutter="10">
-    <el-col :xs="{span:20,offset:2}"
-            :sm="{span: 16,offset:4}" :md="{span:14,offset: 5}" :lg="{span:8,offset: 8}">
-      <el-card style="margin-top: 10%">
-        <el-form :model="form" status-icon :rules="rules" ref="form" style="text-align: center">
-          <h2>登 录</h2>
-          <el-form-item prop="name" label="帐号" :label-width="formLabelWidth">
-            <el-input v-model="form.username" autocomplete="off" aria-required="true"></el-input>
-          </el-form-item>
-          <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
-            <el-input  v-model="form.password" autocomplete="off" show-password></el-input>
-          </el-form-item>
-          <el-button type="primary" @click="login('form')">登录</el-button>
-        </el-form>
-      </el-card>
-    </el-col>
-  </el-row>
+  <div class="bg">
+    <el-row>
+      <el-col :xs="{span:20,offset:2}"
+              :sm="{span: 16,offset:4}" :md="{span:14,offset: 5}" :lg="{span:8,offset: 8}">
+<!--      <el-col span="8" :offset="8">-->
+        <el-card style="margin-top: 10%">
+          <el-form :model="form" status-icon :rules="rules" ref="form" style="text-align: center">
+            <h2>华南师范大学资产采购系统</h2>
+            <h2>登 录</h2>
+            <el-form-item prop="name" label="帐号" :label-width="formLabelWidth">
+              <el-input v-model="form.username" autocomplete="off" aria-required="true"></el-input>
+            </el-form-item>
+            <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
+              <el-input  v-model="form.password" autocomplete="off" show-password></el-input>
+            </el-form-item>
+            <el-button type="primary" @click="login('form')">登录</el-button>
+          </el-form>
+        </el-card>
+      </el-col>
+    </el-row>
+  </div>
+
 
 </template>
 
@@ -23,10 +28,6 @@
 
 import {getAxios} from "@/store/api";
 import router from "@/router";
-// import QS from "qs";
-// import md5 from  'js-md5'
-
-
 
 export default {
   name: "login",
@@ -79,6 +80,8 @@ export default {
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
               this.$store.commit('menuSave', response.data.data)
+              this.$store.commit('loginNameSave',decodeURI(response.headers.loginname));
+              console.log('login name', decodeURI(response.headers.loginname))
               window.sessionStorage.setItem('token',response.headers.authorization);
               window.sessionStorage.setItem('menu',JSON.stringify(response.data.data));
               window.sessionStorage.setItem('username',this.form.username)
@@ -105,6 +108,9 @@ export default {
       })
 
     }
+  },
+  created() {
+    console.log(this.$store.state.userName)
   }
 
 
@@ -112,5 +118,10 @@ export default {
 </script>
 
 <style scoped>
+ .bg{
+   background-color: #efefef;
+   height: 100vh;
+ }
+
 
 </style>

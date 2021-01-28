@@ -9,7 +9,8 @@ export default new Vuex.Store({
     state:{
         token:'',
         userName:'',
-        menu:[]
+        menu:[],
+        loginName:''
     },
     mutations:{
         tokenSave(state, token){
@@ -20,6 +21,21 @@ export default new Vuex.Store({
         },
         menuSave(state, menu){
             state.menu= menu;
+        },
+        loginNameSave(state, loginName){
+            state.loginName = loginName
+        },
+        tokenClear(state){
+            state.token = ''
+        },
+        usernameClear(state){
+            state.userName= ''
+        },
+        menuClear(state){
+            state.menu = ''
+        },
+        loginNameClear(state){
+            state.loginName = ''
         }
     },
     actions:{

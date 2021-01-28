@@ -47,7 +47,7 @@
         width="100">
       <template slot-scope="scope">
         <el-button @click="handleClick(scope.$index,scope.row)" type="text" size="small">查看</el-button>
-        <el-button style="color:red" @click="handleDelete(scope.$index,scope.row)" type="text" size="small">删除</el-button>
+<!--        <el-button style="color:red" @click="handleDelete(scope.$index,scope.row)" type="text" size="small">删除</el-button>-->
       </template>
     </el-table-column>
   </el-table>
