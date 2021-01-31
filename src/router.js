@@ -7,6 +7,7 @@ import listOrder from "@/views/listOrder";
 import addUser from "@/views/addUser";
 import addOrder from "@/views/addOrder";
 import orderDetail from "@/views/orderDetail";
+import notice from "@/views/notice";
 
 Vue.use(VueRouter)
 
@@ -47,7 +48,12 @@ const router = new VueRouter({
             path: '/orderDetail',
             name: 'orderDetail',
             component: orderDetail
+        },{
+            path: '/notices',
+            name: 'notices',
+            component: notice
         }
+
 
     ]
 })

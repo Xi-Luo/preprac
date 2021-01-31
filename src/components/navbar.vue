@@ -23,7 +23,7 @@
           </el-badge>
           <el-dropdown-menu slot="dropdown">
             <el-badge :value="noticeCount" class="item" :hidden="!showDot">
-              <el-dropdown-item icon="el-icon-plus">通知</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-plus" command="notices">通知</el-dropdown-item>
             </el-badge>
             <el-dropdown-item icon="el-icon-switch-button" command="exit">注销</el-dropdown-item>
           </el-dropdown-menu>
@@ -69,7 +69,12 @@ export default {
     handleCommand(command){
       if(command==='exit'){
         this.exit()
+      }else if (command === 'notices'){
+        this.goToNotices()
       }
+    },
+    goToNotices(){
+      this.$router.push({path:'/notices'})
     },
     exit(){
       console.log('exit')

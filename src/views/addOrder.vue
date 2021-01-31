@@ -98,7 +98,7 @@
             <el-button  @click="addItem('newForm')">添加物资条款</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button @click="saveOrder" type="primary" >保存</el-button>
+            <el-button @click="saveOrder" type="primary" >提交</el-button>
           </el-form-item>
 <!--          <el-form-item>-->
 <!--            <el-button type="primary" @click="addItem" style="float: right">提交</el-button>-->

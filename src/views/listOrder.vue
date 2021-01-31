@@ -62,7 +62,6 @@
             :total="total">
         </el-pagination>
       </div>
-
     </div>
 
   </div>
@@ -132,6 +131,14 @@ export default {
         }
       }).then((res)=>{
         this.orderApplies = res.data.data.content;
+        for(let i = 0; i <this.orderApplies.length;i++){
+          console.log(this.orderApplies[i].status)
+          if(this.orderApplies[i].status===0) {
+            this.orderApplies[i].status0 = '已保存'
+          } else if (this.orderApplies[i].status ===1) {
+            this.orderApplies[i].status0 = '已提交'
+          }
+        }
       })
     }
   },
