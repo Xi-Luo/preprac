@@ -64,7 +64,7 @@ export default {
   methods:{
     handleSelect(key, keyPath) {
       this.$router.push({path:key})
-      console.log(key, keyPath)
+      console.log('this is in navbar',key, keyPath)
     },
     handleCommand(command){
       if(command==='exit'){
@@ -78,12 +78,23 @@ export default {
     },
     exit(){
       console.log('exit')
-      sessionStorage.clear()
-      this.$store.commit('tokenClear')
-      this.$store.commit('menuClear')
-      this.$store.commit('usernameClear')
-      this.$store.commit('loginNameClear')
-      this.$router.push({path:'/login'})
+      this.$getAxios(true).get('/user/logout',{
+        params:{
+          uid: this.$store.state.userName
+        }
+      }).then(res=>{
+        console.log(res)
+        if(res.data.success){
+          sessionStorage.clear()
+          this.$store.commit('tokenClear')
+          this.$store.commit('usernameClear')
+          this.$store.commit('loginNameClear')
+          this.$router.push({path:'/login'})
+        }
+      }).catch(err=>{console.log(err)})
+
+
+
     }
   }
 }

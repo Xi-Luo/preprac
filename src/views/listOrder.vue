@@ -44,10 +44,10 @@
     </el-table-column>
     <el-table-column
         label="操作"
-        width="100">
+        width="120">
       <template slot-scope="scope">
         <el-button @click="handleClick(scope.$index,scope.row)" type="text" size="small">查看</el-button>
-<!--        <el-button style="color:red" @click="handleDelete(scope.$index,scope.row)" type="text" size="small">删除</el-button>-->
+        <el-button v-if="scope.row.status" @click="withdrawal(scope.$index,scope.row)" type="text" size="small">撤销提交</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -83,18 +83,45 @@ export default {
       pageSize:2,
       total:0,
       orderApplies:[],
-      orderApply:{
-        id:'',
-        applyDepartment:'',
-        applyUser:'',
-        fundCode:'',
-        applyDate:'',
-        total:'',
-        orderLists:[]
-      },
+      // orderApply:{
+      //   id:'',
+      //   applyDepartment:'',
+      //   applyUser:'',
+      //   fundCode:'',
+      //   applyDate:'',
+      //   total:'',
+      //   orderLists:[]
+      // },
     }
   },
   methods:{
+    withdrawal(index, row){
+      console.log('this is in withdrawal', index, row)
+      this.$getAxios(true).put('/order/recall',{
+        id: row.id
+      }).then(res=>{
+        if (res.data.success){
+          this.$getAxios(true).get('/order/orders',{
+            params:{
+              id:sessionStorage.getItem('username'),
+              page:this.page
+            }
+          }).then((res)=> {
+            if (res.data.success) {
+              this.orderApplies = res.data.data.content;
+              for (let i = 0; i < this.orderApplies.length; i++) {
+                if (this.orderApplies[i].status === 0) {
+                  this.orderApplies[i].status0 = '已保存'
+                } else if (this.orderApplies[i].status === 1) {
+                  this.orderApplies[i].status0 = '已提交'
+                }
+              }
+            }
+          })
+        }
+      }).catch(err=>{console.log(err)})
+
+    },
     handleDelete(index,row){
       this.$confirm('确定要删除吗？', '提示', {
         confirmButtonText: '确定',
@@ -143,13 +170,14 @@ export default {
     }
   },
   created() {
-
+    console.log('list position0')
     this.$getAxios(true).get('/order/orders',{
       params:{
         id:sessionStorage.getItem('username'),
         page:this.page
       }
     }).then((res)=>{
+      console.log()
       if(res.data.success){
         this.orderApplies = res.data.data.content;
         for(let i = 0; i <this.orderApplies.length;i++){

@@ -8,10 +8,10 @@
           <el-form :model="form" status-icon :rules="rules" ref="form" style="text-align: center">
             <h2>华南师范大学资产采购系统</h2>
             <h2>登 录</h2>
-            <el-form-item prop="name" label="帐号" :label-width="formLabelWidth">
+            <el-form-item prop="username" label="帐号" :label-width="formLabelWidth">
               <el-input v-model="form.username" autocomplete="off" aria-required="true"></el-input>
             </el-form-item>
-            <el-form-item prop="pass" label="密码" :label-width="formLabelWidth">
+            <el-form-item prop="password" label="密码" :label-width="formLabelWidth">
               <el-input  v-model="form.password" autocomplete="off" show-password></el-input>
             </el-form-item>
             <el-button type="primary" @click="login('form')">登录</el-button>
@@ -52,17 +52,17 @@ export default {
         username: '',
         password: ''
       },
-      menu:[],
+      // menu:[],
       menuItem:{
         name:'',
         index:''
       },
       formLabelWidth: '40px',
       rules:{
-        pass:[{
+        password:[{
           validator: validatePass,trigger:'blur'
         }],
-        name:[{
+        username:[{
           validator: validateName, trigger: 'blur'
         }]
       }
@@ -76,14 +76,16 @@ export default {
               username:this.form.username,
               password: this.form.password
             }).then(response=>{
+              console.log('',response)
             if(response.data.success===true){
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
-              this.$store.commit('menuSave', response.data.data)
-              this.$store.commit('loginNameSave',decodeURI(response.headers.loginname));
-              console.log('login name', decodeURI(response.headers.loginname))
+              // this.$store.commit('menuSave', response.data.data.menu)
+
+              this.$store.commit('loginNameSave',response.data.data.loginName);
+              console.log('loginName',response.data.data.loginName )
               window.sessionStorage.setItem('token',response.headers.authorization);
-              window.sessionStorage.setItem('menu',JSON.stringify(response.data.data));
+              window.sessionStorage.setItem('menu',JSON.stringify(response.data.data.menu));
               window.sessionStorage.setItem('username',this.form.username)
               // this.$store.commit('userNameSave', )
               this.$message({
@@ -99,6 +101,7 @@ export default {
             }
           }).catch(error=>{console.log(error);})
         }else{
+          console.log('this is out')
           this.$message({
             message:'帐号或密码错误',
             type: 'error'
@@ -108,9 +111,6 @@ export default {
       })
 
     }
-  },
-  created() {
-    console.log(this.$store.state.userName)
   }
 
 

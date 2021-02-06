@@ -392,13 +392,16 @@ export default {
           });
     },
     save () {
+      this.orderApply.status=1
       this.$getAxios(true).put('/order',this.orderApply).then(res=>{
         console.log('res',res.data)
         if (res.data.success) {
           this.$message({
             type: 'success',
-            message: '保存成功'
+            message: '提交成功'
           })
+        }else{
+          this.$message.error('提交失败')
         }
       })
     },

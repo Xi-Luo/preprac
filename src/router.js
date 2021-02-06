@@ -2,12 +2,13 @@ import VueRouter from "vue-router"
 import Vue from "vue"
 
 import login from './views/login'
-import information from "./views/information";
 import listOrder from "@/views/listOrder";
 import addUser from "@/views/addUser";
 import addOrder from "@/views/addOrder";
 import orderDetail from "@/views/orderDetail";
 import notice from "@/views/notice";
+import info from "@/views/info";
+import approval from "@/views/approval";
 
 Vue.use(VueRouter)
 
@@ -24,15 +25,9 @@ const router = new VueRouter({
             component: login
         },
         {
-            path:'/info',
-            name: 'info',
-            component: information
-        },
-        {
             path: '/adduser',
-            name:  'addUser',
+            name:  'adduser',
             component: addUser
-
         },
         {
             path: '/addOrder',
@@ -52,9 +47,15 @@ const router = new VueRouter({
             path: '/notices',
             name: 'notices',
             component: notice
+        },{
+            path:'/info',
+            name: 'info',
+            component: info
+        },{
+            path: '/approval',
+            name:'approval',
+            component: approval
         }
-
-
     ]
 })
 

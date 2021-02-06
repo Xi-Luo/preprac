@@ -1,6 +1,7 @@
 <template>
 <div>
   <navbar></navbar>
+  <div style="padding-top: 65px"></div>
   addUser
 </div>
 </template>
