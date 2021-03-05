@@ -75,7 +75,6 @@ export default {
       this.$router.push({path:'/notices'})
     },
     exit(){
-
       this.$getAxios(true).get('/user/logout',{
         params:{
           uid: this.$store.state.userName

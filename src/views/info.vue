@@ -56,6 +56,19 @@ export default {
           console.log(res)
           if(res.data.success){
             this.$message.success('修改成功')
+            this.$getAxios(true).get('/user/logout',{
+              params:{
+                uid: this.$store.state.userName
+              }
+            }).then(res=>{
+              if(res.data.success){
+                sessionStorage.clear()
+                this.$store.commit('tokenClear')
+                this.$store.commit('usernameClear')
+                this.$store.commit('loginNameClear')
+                this.$router.push({path:'/login'})
+              }
+            }).catch(err=>{console.log(err)})
           }else{
             this.$message.error('修改失败')
           }
