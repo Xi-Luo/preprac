@@ -96,6 +96,7 @@ export default {
       }).then(res=>{
         if (res.data.success){
           this.$message.success('通过成功')
+          this.$router.push({path:'/approval'})
         }else{
           this.$message.error('通过失败')
         }
@@ -114,7 +115,9 @@ export default {
         }).then(res=>{
           if(res.data.success){
             this.$message.success('操作成功')
+            this.$router.push({path:'/approval'})
           }else {
+            console.log('this is denyConfirm',res)
             this.$message.error('操作失败')
           }
           this.denyDialog = false

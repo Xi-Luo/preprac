@@ -351,6 +351,7 @@ export default {
           });
     },
     saveOrder(){
+      console.log('this is saveOrder')
       this.$getAxios(true).post('/order',this.orderApply
       ).then((res)=>{
         if (res.data.success){
@@ -358,6 +359,7 @@ export default {
             type:'success',
             message:'添加成功'
           })
+          this.$router.push({path:'/listOrder'})
         }
       })
     },
