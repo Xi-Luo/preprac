@@ -27,8 +27,10 @@
       </el-form-item>
         <el-form-item label="采购总金额">
           {{orderApply.total}}
-<!--          <el-input type="number" style="width: 10vw" placeholder="采购总金额" v-model="orderApply.total"></el-input>-->
         </el-form-item>
+      <el-form-item label="状态:">
+        {{orderApply.status0}}
+      </el-form-item>
     </el-form>
     <el-table
         :data="orderApply.orderLists">
@@ -118,7 +120,9 @@
         </el-upload>
       </div>
     <el-form :inline="true" style="float: right" class="form">
-
+      <el-form-item>
+        <el-button v-if="orderApply.hasFile" @click="downloadPhoto">下载签名文件</el-button>
+      </el-form-item>
       <el-form-item>
         <el-button  @click="addItem('newForm')">添加物资条款</el-button>
       </el-form-item>
@@ -126,7 +130,7 @@
         <el-button type="success" plain style="float: right" @click="print">打印</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="save" style="float: right">提交</el-button>
+        <el-button type="primary" @click="save" style="float: right" :disabled="saveDisabled">提交</el-button>
       </el-form-item>
     </el-form>
 
@@ -215,7 +219,7 @@ export default {
     navbar
   },
   created() {
-    this.orderApply = this.$route.query.order
+
     this.initData()
   },
   computed:{
@@ -266,6 +270,7 @@ export default {
   },
   data() {
     return {
+      saveDisabled:false,
       formQuantity:0,
       formUnitPrice:0,
       departmentOptions:[
@@ -318,6 +323,41 @@ export default {
   },
 
   methods: {
+    downloadPhoto(){
+      this.$axios
+          .get("/order/file/download", {
+            params: {
+              id: this.orderApply.id,
+            },
+            responseType: "blob",   //文件下载的 url 需要带上这个参数
+            headers: {
+              Authorization: this.$store.state.token,
+            },
+          })
+          .then((res) => {
+            console.log(res);
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+            );   //根据返回头的content-disposition字段中的参数决定文件名
+            //content-type 决定文件类型
+            const blob = new Blob([data], { type: headers["content-type"] });
+            //下载文件方式：在 html 中插入一个不可见的 a 标签，将返回的文件连接到 a 标签上实现下载
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    },
     editClose(){
       if (this.formUnitPrice>=300000) {
         this.editConfirm()
@@ -328,8 +368,29 @@ export default {
       this.$getAxios(true).get('/department/departments')
           .then((res)=>{
             this.departmentOptions = res.data.data
-          })
+          }).catch(err=>{console.log(err)})
       this.orderApply.uid = this.$store.state.userName
+
+
+      this.$getAxios(true).get('/order',{
+        params:{
+          id:this.$route.query.id
+        }
+      }).then(
+          (res)=>{
+            if(res.data.success){
+              this.orderApply = res.data.data
+              if(this.orderApply.status===0) {
+                this.orderApply.status0 = '已保存'
+              } else if (this.orderApply.status ===1) {
+                this.orderApply.status0 = '已提交'
+                this.saveDisabled = true
+              }
+              console.log('this is orderdetail orderapply',this.orderApply)
+            }
+          }
+      ).catch((error)=>{console.log(error)})
+
     },
     addNewItem () {
       let tmp = {}

@@ -39,6 +39,7 @@
 
 <script>
 import navbar from "@/components/navbar";
+import router from "@/router";
 export default {
   name: "approval",
   components:{
@@ -81,6 +82,8 @@ export default {
   methods:{
     handleClick(index,row){
       console.log('this is approval' ,index, row)
+      router.push({path:'/orderApprove',query:{order:this.orderApplies[index]}})
+
     },
     currentChange(current){
       console.log(current)

@@ -27,12 +27,6 @@
         <el-table
             height="500"
             :data="orderApply.orderLists">
-          <!--      <el-table-column-->
-          <!--          fixed-->
-          <!--          prop="no"-->
-          <!--          label="序号"-->
-          <!--          width="50">-->
-          <!--      </el-table-column>-->
           <el-table-column
               prop="name"
               label="物资名称"
@@ -334,7 +328,6 @@ export default {
             },
           })
           .then((res) => {
-            console.log(res);
             const { data, headers } = res;
             const fileName = headers["content-disposition"].replace(
                 /\w+;filename=(.*)/,
@@ -360,7 +353,6 @@ export default {
     saveOrder(){
       this.$getAxios(true).post('/order',this.orderApply
       ).then((res)=>{
-        console.log(res.data.data)
         if (res.data.success){
           this.$message({
             type:'success',

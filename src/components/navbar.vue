@@ -16,7 +16,7 @@
       </el-submenu>
         <el-dropdown trigger="click" class="account" @command="handleCommand">
           <el-badge :is-dot="showDot" class="UserMenu">
-          <span class="el-dropdown-link">
+          <span class="el-dropdown-link" style="cursor: pointer">
             {{loginName}}
             <i class="el-icon-arrow-down"></i>
           </span>
@@ -55,16 +55,14 @@ export default {
       }
     }).then((res)=>{
       this.noticeCount = res.data.data
-      console.log(this.noticeCount)
       if (res.data.data){
         this.showDot = true
       }
     })
   },
   methods:{
-    handleSelect(key, keyPath) {
+    handleSelect(key) {
       this.$router.push({path:key})
-      console.log('this is in navbar',key, keyPath)
     },
     handleCommand(command){
       if(command==='exit'){
@@ -77,13 +75,12 @@ export default {
       this.$router.push({path:'/notices'})
     },
     exit(){
-      console.log('exit')
+
       this.$getAxios(true).get('/user/logout',{
         params:{
           uid: this.$store.state.userName
         }
       }).then(res=>{
-        console.log(res)
         if(res.data.success){
           sessionStorage.clear()
           this.$store.commit('tokenClear')

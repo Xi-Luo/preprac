@@ -96,7 +96,6 @@ export default {
   },
   methods:{
     withdrawal(index, row){
-      console.log('this is in withdrawal', index, row)
       this.$getAxios(true).put('/order/recall',{
         id: row.id
       }).then(res=>{
@@ -148,7 +147,7 @@ export default {
       }).catch();
     },
     handleClick(index){
-       router.push({path:'/orderDetail',query:{order:this.orderApplies[index]}})
+       router.push({path:'/orderDetail',query:{id:this.orderApplies[index].id}})
     },
     currentChange(current){
       this.$getAxios(true).get('/order/orders',{
@@ -159,7 +158,6 @@ export default {
       }).then((res)=>{
         this.orderApplies = res.data.data.content;
         for(let i = 0; i <this.orderApplies.length;i++){
-          console.log(this.orderApplies[i].status)
           if(this.orderApplies[i].status===0) {
             this.orderApplies[i].status0 = '已保存'
           } else if (this.orderApplies[i].status ===1) {
@@ -170,14 +168,12 @@ export default {
     }
   },
   created() {
-    console.log('list position0')
     this.$getAxios(true).get('/order/orders',{
       params:{
         id:sessionStorage.getItem('username'),
         page:this.page
       }
     }).then((res)=>{
-      console.log()
       if(res.data.success){
         this.orderApplies = res.data.data.content;
         for(let i = 0; i <this.orderApplies.length;i++){
