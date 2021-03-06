@@ -26,6 +26,9 @@ export default new Vuex.Store({
         loginNameSave(state, loginName){
             state.loginName = loginName
         },
+        roleSave(state, role){
+            state.role = role
+        },
         tokenClear(state){
             state.token = ''
         },

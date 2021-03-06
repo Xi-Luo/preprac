@@ -62,7 +62,13 @@ export default {
     }
   },
   created() {
-    this.$getAxios(true).get('/dept/list',{
+    let url
+    if (this.$store.state.role===3){
+      url = '/dept/list'
+    } else {
+      url = '/inst/list'
+    }
+    this.$getAxios(true).get(url,{
       params:{
         page: this.page
       }

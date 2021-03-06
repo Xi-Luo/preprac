@@ -184,7 +184,7 @@ export default {
     }
   },
   created() {
-    this.$getAxios(true).get('/admin/users',{
+    this.$getAxios(true).get('/admin/user/users',{
       params:{
         page:this.page
       }

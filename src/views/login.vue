@@ -14,7 +14,10 @@
             <el-form-item prop="password" label="密码" :label-width="formLabelWidth">
               <el-input  v-model="form.password" autocomplete="off" show-password></el-input>
             </el-form-item>
-            <el-button type="primary" @click="login('form')">登录</el-button>
+            <el-button
+                type="primary"
+                @click="login('form')"
+                @keyup.enter.native="login('form')">登录</el-button>
           </el-form>
         </el-card>
       </el-col>
@@ -68,7 +71,20 @@ export default {
       }
     }
   },
+  mounted() {
+    window.addEventListener('keydown',this.keyDown)
+  },
+  destroyed() {
+    // 销毁事件
+    window.removeEventListener("keydown", this.keyDown, false);
+  },
   methods:{
+    keyDown(e){
+      console.log('you press enter')
+      if (e.keyCode === 13) {
+        this.login('form'); // 定义的登录方法
+      }
+    },
     login(formName){
       this.$refs[formName].validate((valid)=>{
         if (valid){
@@ -76,14 +92,14 @@ export default {
               username:this.form.username,
               password: this.form.password
             }).then(response=>{
-              console.log('',response)
+              console.log('this is login res',response)
             if(response.data.success===true){
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
               // this.$store.commit('menuSave', response.data.data.menu)
-
+              this.$store.commit('roleSave',response.data.data.role)
+              console.log('this is role',response.data.data.role)
               this.$store.commit('loginNameSave',response.data.data.loginName);
-              console.log('loginName',response.data.data.loginName )
               window.sessionStorage.setItem('token',response.headers.authorization);
               window.sessionStorage.setItem('menu',JSON.stringify(response.data.data.menu));
               window.sessionStorage.setItem('username',this.form.username)
