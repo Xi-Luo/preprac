@@ -10,6 +10,8 @@ import notice from "@/views/notice";
 import info from "@/views/info";
 import approval from "@/views/approval";
 import orderApprove from "@/views/orderApprove";
+import deptOrder from "@/views/deptOrder";
+import instOrder from "@/views/instOrder";
 
 Vue.use(VueRouter)
 
@@ -60,6 +62,15 @@ const router = new VueRouter({
             path: '/orderApprove',
             name: 'orderApprove',
             component: orderApprove
+        },{
+            path: '/deptOrder',
+            name: 'deptOrder',
+            component: deptOrder
+        },{
+            path: '/instOrder',
+            name: 'instOrder',
+            component: instOrder
+
         }
     ]
 })

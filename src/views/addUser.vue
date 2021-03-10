@@ -11,6 +11,7 @@
     </el-input>
     <el-button type="primary" @click="search">搜索</el-button>
     <el-button type="primary" @click="addOpen('addForm')">添加用户</el-button>
+    <el-button type="primary" @click="batchAddVisible = true">批量添加用户</el-button>
   </div>
 
   <div style="display: table;margin: 0 auto;">
@@ -121,6 +122,19 @@
         <el-button type="primary" @click="editConfirm">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="批量添加用户" :visible="batchAddVisible" width="400px">
+      <el-upload
+          class="upload-demo"
+          drag
+          action="http://localhost:8080/admin/user/batchAdd"
+          :headers="{ Authorization: this.$store.state.token }"
+          :on-success="uploadSuccess"
+          >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+    </el-dialog>
   </div>
 </div>
 </template>
@@ -134,6 +148,7 @@ export default {
   },
   data(){
     return{
+      batchAddVisible: false,
       editDialogVisible: false,
       roleOptions:[
         {
@@ -206,6 +221,26 @@ export default {
         }).catch(err=>{console.log(err)})
   },
   methods:{
+    uploadSuccess(){
+      this.$message.success('上传成功')
+      this.batchAddVisible = false
+
+      this.$getAxios(true).get('/admin/user/users',{
+        params:{
+          page:this.page
+        }
+      }).then(res=>{
+        if(res.data.success){
+          this.userList = res.data.data.content
+          this.total = res.data.data.totalElements
+          this.page = res.data.data.number+1;
+          this.isLoading = false
+        }else{
+          this.$message.error('获取失败')
+          this.isLoading = false
+        }
+      }).catch(err=>{console.log(err)})
+    },
     editConfirm(){
       this.$getAxios(true).put('/admin/user',this.editForm)
       .then(res=>{
