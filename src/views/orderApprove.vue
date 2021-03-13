@@ -91,7 +91,13 @@ export default {
   },
   methods:{
     agree(){
-      this.$getAxios(true).put("/dept/approve",{
+      let url
+      if(this.$store.state.role===2){
+        url = '/inst/approve'
+      }else {
+        url = '/dept/approve'
+      }
+      this.$getAxios(true).put(url,{
         id:this.orderApply.id
       }).then(res=>{
         if (res.data.success){
@@ -106,10 +112,16 @@ export default {
       this.denyDialog = true
     },
     denyConfirm(){
+      let url
+      if(this.$store.state.role===2){
+        url = '/inst/approve'
+      }else {
+        url = '/dept/approve'
+      }
       if(this.reason===''){
         this.$message.warning('拒绝理由不能为空')
       }else{
-        this.$getAxios(true).put('/dept/deny',{
+        this.$getAxios(true).put(url,{
           id:this.orderApply.id,
           reason:this.reason
         }).then(res=>{

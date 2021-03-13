@@ -105,7 +105,7 @@
         </template>
       </el-table-column>
     </el-table>
-      <div style="width: 300px">
+      <div style="width: 300px;margin:1rem">
         <el-upload
             class="upload-demo"
             action="http://localhost:8080/order/file"
@@ -113,7 +113,7 @@
             :data="{ id: this.orderApply.id }"
             :before-upload="beforeUpload"
         >
-          <el-button size="small" type="primary">点击上传</el-button>
+          <el-button size="small" type="primary">点击上传申请单图片</el-button>
           <div class="el-upload__tip" slot="tip">
             只能上传 jpg/png 图片，且大小不能超过5MB
           </div>

@@ -28,8 +28,8 @@ const router = new VueRouter({
             component: login
         },
         {
-            path: '/adduser',
-            name:  'adduser',
+            path: '/listUser',
+            name:  'listUser',
             component: addUser
         },
         {
