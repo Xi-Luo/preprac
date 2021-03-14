@@ -3,108 +3,66 @@
     <navbar></navbar>
 
     <div style="padding-top: 65px">
-    <el-form :inline="true" class="demo-form-inline" :model="orderApply">
-      <el-form-item label="编号:">{{orderApply.id}}
-      </el-form-item>
-      <el-form-item label="采购经费代码:">
-        {{orderApply.fundCode}}
-      </el-form-item>
-      <el-form-item label="申请日期：">
-        {{orderApply.applyDate}}
-      </el-form-item>
-      <el-form-item label="申请部门">
-        <el-select v-model="orderApply.applyDepartment" placeholder="请选择">
-          <el-option
-              v-for="item in departmentOptions"
-              :key="item.id"
-              :label="item.deptName"
-              :value="item.deptName">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="申请人">
-        <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
-      </el-form-item>
-        <el-form-item label="采购总金额">
-          {{orderApply.total}}
-        </el-form-item>
-      <el-form-item label="状态:">
-        {{orderApply.status0}}
-      </el-form-item>
-    </el-form>
-    <el-table
-        :data="orderApply.orderLists">
-      <el-table-column
-          type="index"
-          width="50"
-          label="序号">
-      </el-table-column>
-      <!--      <el-table-column-->
-      <!--          fixed-->
-      <!--          prop="no"-->
-      <!--          label="序号"-->
-      <!--          width="50">-->
-      <!--      </el-table-column>-->
-      <el-table-column
-          prop="name"
-          label="物资名称"
-          width="100">
-      </el-table-column>
-      <el-table-column
-          prop="type"
-          label="品牌型号"
-          width="100">
-      </el-table-column>
-      <el-table-column
-          prop="configuration"
-          label="配置或技术参数"
-          width="240">
-      </el-table-column>
-      <el-table-column
-          prop="unit"
-          label="单位"
-          width="80">
-      </el-table-column>
-      <el-table-column
-          prop="quantity"
-          label="数量"
-          width="80">
-      </el-table-column>
-      <el-table-column
-          prop="budgetUnitPrice"
-          label="预算单价(元)"
-          width="80">
-      </el-table-column>
-      <el-table-column
-          prop="budgetTotalPrice"
-          label="预算总价(元)"
-          width="100">
-      </el-table-column>
-      <el-table-column
-          prop="reason"
-          label="申请原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)"
-          width="240">
-      </el-table-column>
-      <el-table-column
-          prop="newUser"
-          label="新设备使用人"
-          width="120">
-      </el-table-column>
-      <el-table-column
-          fixed="right"
-          label="操作"
-          width="150">
-        <template slot-scope="scope">
-          <el-button
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      <div style="display: flex;justify-content: center">
+        <el-form :inline="true" class="demo-form-inline" :model="orderApply">
+          <el-form-item label="编号:">{{orderApply.id}}
+          </el-form-item>
+          <el-form-item label="采购经费代码:">
+            {{orderApply.fundCode}}
+          </el-form-item>
+          <el-form-item label="申请日期：">
+            {{orderApply.applyDate}}
+          </el-form-item>
+          <el-form-item label="申请部门">
+            <el-select v-model="orderApply.applyDepartment" placeholder="请选择">
+              <el-option
+                  v-for="item in departmentOptions"
+                  :key="item.id"
+                  :label="item.deptName"
+                  :value="item.deptName">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="申请人">
+            <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
+          </el-form-item>
+          <el-form-item label="采购总金额">
+            {{orderApply.total}}
+          </el-form-item>
+          <el-form-item label="状态:">
+            {{orderApply.status0}}
+          </el-form-item>
+        </el-form>
+      </div>
+      <div style="margin:0 1rem">
+        <el-table
+            border
+            :data="orderApply.orderLists">
+          <el-table-column
+              v-for="(item,index) in tableList"
+              :key="index"
+              :prop="item.prop"
+              :label="item.label"
+              :width="item.width"
+          >
+          </el-table-column>
+          <el-table-column
+              fixed="right"
+              label="操作"
+              width="150">
+            <template slot-scope="scope">
+              <el-button
+                  size="mini"
+                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
       <div style="width: 300px;margin:1rem">
         <el-upload
             class="upload-demo"
@@ -121,7 +79,7 @@
       </div>
     <el-form :inline="true" style="float: right" class="form">
       <el-form-item>
-        <el-button v-if="orderApply.hasFile" @click="downloadPhoto">下载签名文件</el-button>
+        <el-button v-if="orderApply.hasFile" @click="downloadPhoto">下载申请单图片</el-button>
       </el-form-item>
       <el-form-item>
         <el-button  @click="addItem('newForm')">添加物资条款</el-button>
@@ -219,7 +177,6 @@ export default {
     navbar
   },
   created() {
-
     this.initData()
   },
   computed:{
@@ -270,6 +227,18 @@ export default {
   },
   data() {
     return {
+      tableList:[
+        {prop:'id',label:'序号',width:'110'},
+        {prop:'name',label:'物资名称',width:'100'},
+        {prop:'type',label:'品牌型号',width:'100'},
+        {prop:'configuration',label:'配置或技术参数',width:'240'},
+        {prop:'unit',label:'单位',width:'50'},
+        {prop:'quantity',label:'数量',width:'50'},
+        {prop:'budgetUnitPrice',label: '预算单价',width: '80'},
+        {prop:'budgetTotalPrice',label: '预算总价',width: '80'},
+        {prop:'reason',label: '申请原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)',width: '240'},
+        {prop: 'newUser',label: '新设备使用人',width: '100'}
+      ],
       saveDisabled:false,
       formQuantity:0,
       formUnitPrice:0,

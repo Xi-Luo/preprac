@@ -139,6 +139,8 @@ export default {
               this.orderList[i].status0 = '已提交'
             } else if (this.orderList[i].status === 2){
               this.orderList[i].status0 = '部门领导已通过'
+            } else {
+              this.orderList[i].status0 = '主管领导已通过'
             }
           }
           this.total = res.data.data.totalElements;

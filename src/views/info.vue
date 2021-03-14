@@ -19,10 +19,10 @@
           <el-form-item label="确认新密码">
             <el-input v-model="newPassConfirm" size="mini" show-password></el-input>
           </el-form-item>
-          <el-form-item style="text-align: center">
-            <el-button type="primary" @click="confirmChange">确认修改</el-button>
-          </el-form-item>
         </el-form>
+        <div style="text-align: center">
+          <el-button type="primary" @click="confirmChange">确认修改</el-button>
+        </div>
       </el-card>
     </div>
   </div>

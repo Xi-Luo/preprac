@@ -57,7 +57,7 @@
     />
     <el-table-column
         label="操作"
-        width="120">
+        width="150">
       <template slot-scope="scope">
         <el-button @click="handleClick(scope.$index,scope.row)" type="text" size="small">查看</el-button>
         <el-button v-if="scope.row.status" @click="withdrawal(scope.$index,scope.row)" type="text" size="small">撤销提交</el-button>
@@ -101,9 +101,9 @@ export default {
         fundCode:''
       },
       tableList:[
-        {prop:'id',label:'编号',width:'120'},
-        {prop:'applyDepartment',label:'申请部门',width:'120'},
-        {prop:'applyUser',label:'申请人',width:'120'},
+        {prop:'id',label:'编号',width:'100'},
+        {prop:'applyDepartment',label:'申请部门',width:'90'},
+        {prop:'applyUser',label:'申请人',width:'100'},
         {prop:'applyDate',label:'申请日期',width:'150'},
         {prop:'fundCode',label:'申请经费代码',width:'120'},
         {prop:'total',label:'总金额',width:'120'},
@@ -174,6 +174,10 @@ export default {
                   this.orderApplies[i].status0 = '已保存'
                 } else if (this.orderApplies[i].status === 1) {
                   this.orderApplies[i].status0 = '已提交'
+                } else if (this.orderList[i].status === 2) {
+                  this.orderList[i].status0 = '部门领导已通过'
+                } else {
+                  this.orderList[i].status0 = '主管领导已通过'
                 }
               }
             }
@@ -223,6 +227,10 @@ export default {
             this.orderApplies[i].status0 = '已保存'
           } else if (this.orderApplies[i].status ===1) {
             this.orderApplies[i].status0 = '已提交'
+          } else if (this.orderApplies[i].status === 2) {
+            this.orderApplies[i].status0 = '部门领导已通过'
+          } else {
+            this.orderApplies[i].status0 = '主管领导已通过'
           }
         }
       })
@@ -244,6 +252,10 @@ export default {
             this.orderApplies[i].status0 = '已保存'
           } else if (this.orderApplies[i].status ===1) {
             this.orderApplies[i].status0 = '已提交'
+          } else if (this.orderApplies[i].status === 2) {
+            this.orderApplies[i].status0 = '部门领导已通过'
+          } else {
+            this.orderApplies[i].status0 = '主管领导已通过'
           }
         }
         this.total = res.data.data.totalElements;
@@ -265,7 +277,9 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  padding:12px 10px;
+}
 .parent-page{
   text-align: center;
   margin-top: 10px;
