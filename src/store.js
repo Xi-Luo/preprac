@@ -9,7 +9,7 @@ export default new Vuex.Store({
     state:{
         token:'',
         userName:'',
-        // menu:[],
+        menu:[],
         loginName:'',
         role:''
     },
@@ -20,9 +20,9 @@ export default new Vuex.Store({
         userNameSave(state, userName){
             state.userName = userName;
         },
-        // menuSave(state, menu){
-        //     state.menu= menu;
-        // },
+        menuSave(state, menu){
+            state.menu= menu;
+        },
         loginNameSave(state, loginName){
             state.loginName = loginName
         },

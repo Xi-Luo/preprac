@@ -29,7 +29,7 @@
 
 <script>
 
-import {getAxios} from "@/store/api";
+// import {getAxios} from "@/store/api";
 import router from "@/router";
 
 export default {
@@ -80,7 +80,6 @@ export default {
   },
   methods:{
     keyDown(e){
-      console.log('you press enter')
       if (e.keyCode === 13) {
         this.login('form'); // 定义的登录方法
       }
@@ -88,7 +87,7 @@ export default {
     login(formName){
       this.$refs[formName].validate((valid)=>{
         if (valid){
-            getAxios(false).post('/user/login', {
+            this.$axios.post('/user/login', {
               username:this.form.username,
               password: this.form.password
             }).then(response=>{
@@ -96,14 +95,9 @@ export default {
             if(response.data.success===true){
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
-              // this.$store.commit('menuSave', response.data.data.menu)
+              this.$store.commit('menuSave', response.data.data.menu)
               this.$store.commit('roleSave',response.data.data.role)
-              console.log('this is role',response.data.data.role)
               this.$store.commit('loginNameSave',response.data.data.loginName);
-              window.sessionStorage.setItem('token',response.headers.authorization);
-              window.sessionStorage.setItem('menu',JSON.stringify(response.data.data.menu));
-              window.sessionStorage.setItem('username',this.form.username)
-              // this.$store.commit('userNameSave', )
               this.$message({
                 message:'登录成功',
                 type:'success'
@@ -117,7 +111,6 @@ export default {
             }
           }).catch(error=>{console.log(error);})
         }else{
-          console.log('this is out')
           this.$message({
             message:'帐号或密码错误',
             type: 'error'

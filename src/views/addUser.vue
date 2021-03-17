@@ -123,7 +123,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="批量添加用户" :visible="batchAddVisible" width="400px">
+    <el-dialog title="批量添加用户" :visible.sync="batchAddVisible" width="400px">
       <el-upload
           class="upload-demo"
           drag

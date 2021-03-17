@@ -59,40 +59,23 @@ export default {
     }
   },
   created(){
-    this.$getAxios(true).get('/notice/notices',{
-      params:{
-        uid: this.$store.state.userName,
-        page:this.page
-      }
-    }).then(res=>{
-      this.notices = res.data.data.content
-      this.total = res.data.data.totalElements
-      this.page = res.data.data.number + 1
-      console.log('',res)
-      console.log('t p ', this.total, this.page)
-    })
-    this.$getAxios(true).get('/notice',{
-      params:{
-        id:1
-      }
-    }).then(res=>{
-      console.log('notice res',res)
-    })
+    this.getNotices(1)
   },
   methods:{
-    currentChange(current){
-      this.$getAxios(true).get('/notice/notices',{
+    getNotices(page){
+      this.$axios.get('/notice/notices',{
         params:{
           uid: this.$store.state.userName,
-          page:current
+          page: page
         }
       }).then(res=>{
         this.notices = res.data.data.content
         this.total = res.data.data.totalElements
         this.page = res.data.data.number + 1
-        console.log('',res)
-        console.log('t p ', this.total, this.page)
-      })
+      }).catch(err=>{console.log(err)})
+    },
+    currentChange(current){
+      this.getNotices(current)
     }
   }
 }

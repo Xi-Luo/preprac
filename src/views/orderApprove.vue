@@ -114,9 +114,9 @@ export default {
     denyConfirm(){
       let url
       if(this.$store.state.role===2){
-        url = '/inst/approve'
+        url = '/inst/deny'
       }else {
-        url = '/dept/approve'
+        url = '/dept/deny'
       }
       if(this.reason===''){
         this.$message.warning('拒绝理由不能为空')

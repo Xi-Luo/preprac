@@ -1,9 +1,8 @@
 <template>
   <div>
     <navbar></navbar>
-    <div style="padding-top: 65px">
+    <div style="padding-top: 65px;margin-left: 1rem">
         <el-form :inline="true" class="demo-form-inline" :model="orderApply">
-
           <el-form-item label="申请部门">
             <el-select v-model="orderApply.applyDepartment" placeholder="请选择">
               <el-option
@@ -24,156 +23,119 @@
             {{this.orderApply.total}}
           </el-form-item>
         </el-form>
-        <el-table
-            height="500"
-            :data="orderApply.orderLists">
-          <el-table-column
-              prop="name"
-              label="物资名称"
-              width="100">
-          </el-table-column>
-          <el-table-column
-              prop="type"
-              label="品牌型号"
-              width="100">
-          </el-table-column>
-          <el-table-column
-              prop="configuration"
-              label="配置或技术参数"
-              width="240">
-          </el-table-column>
-          <el-table-column
-              prop="quantity"
-              label="单位"
-              width="80">
-          </el-table-column>
-          <el-table-column
-              prop="quantity"
-              label="数量"
-              width="80">
-          </el-table-column>
-          <el-table-column
-              prop="budgetUnitPrice"
-              label="预算单价(元)"
-              width="80">
-          </el-table-column>
-          <el-table-column
-              prop="budgetTotalPrice"
-              label="预算总价(元)"
-              width="100">
-          </el-table-column>
-          <el-table-column
-              prop="reason"
-              label="申请原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)"
-              width="240">
-          </el-table-column>
-          <el-table-column
-              prop="newUser"
-              label="新设备使用人"
-              width="120">
-          </el-table-column>
-          <el-table-column
-              fixed="right"
-              label="操作"
-              width="150">
-            <template slot-scope="scope">
-              <el-button
-                  size="mini"
-                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-form :inline="true" style="float: right" class="form">
-          <el-form-item>
-            <el-button  @click="addItem('newForm')">添加物资条款</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="saveOrder" type="primary" >提交</el-button>
-          </el-form-item>
-<!--          <el-form-item>-->
-<!--            <el-button type="primary" @click="addItem" style="float: right">提交</el-button>-->
-<!--          </el-form-item>-->
-        </el-form>
-
-        <el-dialog title="编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="editClose">
-          <el-form :model="form">
-            <el-form-item label="物资名称" :label-width="formLabelWidth">
-              <el-input v-model="form.name" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="品牌型号" :label-width="formLabelWidth">
-              <el-input v-model="form.type" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="配置或技术参数" :label-width="formLabelWidth">
-              <el-input type="textarea" :rows="5" v-model="form.configuration" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
-              <el-input v-model="form.unit" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="数量" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" v-model="formQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
-            </el-form-item>
-            <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" v-model="formUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input-number>
-            </el-form-item>
-            <el-form-item label="预算总价" :label-width="formLabelWidth">
-              {{ formTotal }}
-<!--              <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>-->
-            </el-form-item>
-            <el-form-item label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
-              <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="新设备使用人" :label-width="formLabelWidth">
-              <el-input v-model="form.newUser" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-<!--          <div slot="footer" class="dialog-footer">-->
-<!--            <el-button @click="dialogFormVisible = false">取 消</el-button>-->
-<!--            <el-button type="primary" @click="editConfirm">确 定</el-button>-->
-<!--          </div>-->
-        </el-dialog>
-
-        <el-dialog title="添加资产" :visible.sync="newDialogVisible">
-          <el-form ref="newForm" :model="newForm">
-            <el-form-item prop="name" label="物资名称" :label-width="formLabelWidth">
-              <el-input v-model="newForm.name" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="type" label="品牌型号" :label-width="formLabelWidth">
-              <el-input v-model="newForm.type" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="configuration" label="配置或技术参数" :label-width="formLabelWidth">
-              <el-input type="textarea" :rows="5" v-model="newForm.configuration" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
-              <el-input v-model="newForm.unit" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="quantity" label="数量" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
-            </el-form-item>
-            <el-form-item prop="budgetUnitPrice" label="预算单价(元)" :label-width="formLabelWidth">
-              <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
-            </el-form-item>
-            <el-form-item prop="budgetTotalPrice" label="预算总价" :label-width="formLabelWidth">
-              {{itemTotal}}
-<!--              <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>-->
-            </el-form-item>
-            <el-form-item prop="reason" label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
-              <el-input type="textarea" :rows="5" v-model="newForm.reason" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
-              <el-input v-model="newForm.newUser" autocomplete="off"></el-input>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="newDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="addNewItem">确 定</el-button>
-          </div>
-        </el-dialog>
-
     </div>
+    <div style="margin:0 1rem">
+      <el-table
+          border
+          :data="orderApply.orderLists">
+        <el-table-column
+            v-for="(item,index) in tableList"
+            :key="index"
+            :prop="item.prop"
+            :label="item.label"
+            :width="item.width"
+        >
+        </el-table-column>
+        <el-table-column
+            fixed="right"
+            label="操作"
+            width="150">
+          <template slot-scope="scope">
+            <el-button
+                size="mini"
+                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            <el-button
+                size="mini"
+                type="danger"
+                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div>
+      <el-form :inline="true" style="float: right" class="form">
+        <el-form-item>
+          <el-button  @click="addItem('newForm')">添加物资条款</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="saveOrder" type="primary" >提交</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <el-dialog title="编辑" :visible.sync="dialogFormVisible" :close-on-click-modal="false" @close="editClose">
+      <el-form :model="form">
+        <el-form-item label="物资名称" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="品牌型号" :label-width="formLabelWidth">
+          <el-input v-model="form.type" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="配置或技术参数" :label-width="formLabelWidth">
+          <el-input type="textarea" :rows="5" v-model="form.configuration" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
+          <el-input v-model="form.unit" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="数量" :label-width="formLabelWidth">
+          <el-input-number controls-position="right" v-model="formQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
+        </el-form-item>
+        <el-form-item label="预算单价(元)" :label-width="formLabelWidth">
+          <el-input-number controls-position="right" v-model="formUnitPrice" placeholder="请输入数字"  autocomplete="off"></el-input-number>
+        </el-form-item>
+        <el-form-item label="预算总价" :label-width="formLabelWidth">
+          {{ formTotal }}
+          <!--              <el-input type="number" v-model="form.budgetTotalPrice" placeholder="请输入数字"  autocomplete="off"></el-input>-->
+        </el-form-item>
+        <el-form-item label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
+          <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="新设备使用人" :label-width="formLabelWidth">
+          <el-input v-model="form.newUser" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <!--          <div slot="footer" class="dialog-footer">-->
+      <!--            <el-button @click="dialogFormVisible = false">取 消</el-button>-->
+      <!--            <el-button type="primary" @click="editConfirm">确 定</el-button>-->
+      <!--          </div>-->
+    </el-dialog>
+
+    <el-dialog title="添加资产" :visible.sync="newDialogVisible">
+      <el-form ref="newForm" :model="newForm">
+        <el-form-item prop="name" label="物资名称" :label-width="formLabelWidth">
+          <el-input v-model="newForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="type" label="品牌型号" :label-width="formLabelWidth">
+          <el-input v-model="newForm.type" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="configuration" label="配置或技术参数" :label-width="formLabelWidth">
+          <el-input type="textarea" :rows="5" v-model="newForm.configuration" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="unit" label="单位" :label-width="formLabelWidth">
+          <el-input v-model="newForm.unit" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="quantity" label="数量" :label-width="formLabelWidth">
+          <el-input-number controls-position="right" type="number" v-model="newFormQuantity" placeholder="请输入数字"  autocomplete="off"></el-input-number>
+        </el-form-item>
+        <el-form-item prop="budgetUnitPrice" label="预算单价(元)" :label-width="formLabelWidth">
+          <el-input-number controls-position="right" type="number" v-model="newFormUnitPrice" placeholder="请输入数字" autocomplete="off"></el-input-number>
+        </el-form-item>
+        <el-form-item prop="budgetTotalPrice" label="预算总价" :label-width="formLabelWidth">
+          {{itemTotal}}
+          <!--              <el-input type="number" v-model="newForm.budgetTotalPrice" placeholder="请输入数字" autocomplete="off"></el-input>-->
+        </el-form-item>
+        <el-form-item prop="reason" label="原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)" :label-width="formLabelWidth">
+          <el-input type="textarea" :rows="5" v-model="newForm.reason" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
+          <el-input v-model="newForm.newUser" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="newDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addNewItem">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -233,6 +195,18 @@ export default {
   },
   data() {
     return {
+      tableList:[
+        {prop:'id',label:'序号',width:'110'},
+        {prop:'name',label:'物资名称',width:'100'},
+        {prop:'type',label:'品牌型号',width:'100'},
+        {prop:'configuration',label:'配置或技术参数',width:'240'},
+        {prop:'unit',label:'单位',width:'50'},
+        {prop:'quantity',label:'数量',width:'50'},
+        {prop:'budgetUnitPrice',label: '预算单价',width: '80'},
+        {prop:'budgetTotalPrice',label: '预算总价',width: '80'},
+        {prop:'reason',label: '申请原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)',width: '240'},
+        {prop: 'newUser',label: '新设备使用人',width: '100'}
+      ],
       formQuantity:'',
       formUnitPrice:'',
       newFormQuantity:'',
@@ -314,7 +288,6 @@ export default {
         this.orderApply.total = this.orderApply.total + parseFloat(this.newForm.budgetTotalPrice)
         this.newDialogVisible = false
       }
-
     },
     downloadFile(){
       this.$axios

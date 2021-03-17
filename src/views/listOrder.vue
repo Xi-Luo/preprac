@@ -60,7 +60,7 @@
         width="150">
       <template slot-scope="scope">
         <el-button @click="handleClick(scope.$index,scope.row)" type="text" size="small">查看</el-button>
-        <el-button v-if="scope.row.status" @click="withdrawal(scope.$index,scope.row)" type="text" size="small">撤销提交</el-button>
+        <el-button v-if="scope.row.status===1" @click="withdrawal(scope.$index,scope.row)" type="text" size="small">撤销提交</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -117,6 +117,46 @@ export default {
     }
   },
   methods:{
+    getOrders(page){
+      this.$axios.get('/order/orders', {
+        params:{
+          oid:this.searchForm.oid,
+              applyDept:this.searchForm.applyDept,
+              startDate:this.searchForm.startDate,
+              endDate:this.searchForm.endDate,
+              user:this.searchForm.user,
+              fundCode:this.searchForm.fundCode,
+              page:page
+        }
+      }).then((res)=>{
+        if(res.data.success){
+          this.orderApplies = res.data.data.content;
+          for(let i = 0; i <this.orderApplies.length;i++){
+            if(this.orderApplies[i].status===0) {
+              this.orderApplies[i].status0 = '已保存'
+            } else if (this.orderApplies[i].status ===1) {
+              this.orderApplies[i].status0 = '已提交'
+            } else if (this.orderApplies[i].status === 2) {
+              this.orderApplies[i].status0 = '部门领导已通过'
+            } else {
+              this.orderApplies[i].status0 = '主管领导已通过'
+            }
+          }
+          this.total = res.data.data.totalElements;
+          this.page = res.data.data.number+1;
+          this.pageSize = res.data.data.pageSize;
+          this.isLoading = false
+        } else{
+          this.isLoading = false
+          this.$message(
+              {
+                message:'获取失败',
+                type: 'error'
+              }
+          )
+        }
+      }).catch(err=>{console.log(err)})
+    },
     clearForm(){
       this.searchForm={
         oid:'',
@@ -129,59 +169,20 @@ export default {
     },
     search(){
       this.isLoading = true
-      this.$getAxios(true).get('/order/orders',{
-        params:{
-          oid:this.searchForm.oid,
-          applyDept:this.searchForm.applyDept,
-          startDate:this.searchForm.startDate,
-          endDate:this.searchForm.endDate,
-          user:this.searchForm.user,
-          fundCode:this.searchForm.fundCode,
-          page:1
-        }
-      }).then(res=>{
-        if(res.data.success){
-          this.orderApplies = res.data.data.content
-          this.total = res.data.data.totalElements;
-          this.page = res.data.data.number+1;
-          this.pageSize = res.data.data.pageSize;
-          this.isLoading = false
-        }
-      }).catch(err=>{console.log(err)})
-
+      this.getOrders(1)
     },
     getDepartmentOptions(){
-      this.$getAxios(true).get('/department/departments')
+      this.$axios.get('/department/departments')
           .then((res)=>{
             this.departmentOptions = res.data.data
           }).catch(err=>{console.log(err)})
     },
     withdrawal(index, row){
-      this.$getAxios(true).put('/order/recall',{
+      this.$axios.put('/order/recall',{
         id: row.id
       }).then(res=>{
         if (res.data.success){
-          this.$getAxios(true).get('/order/orders',{
-            params:{
-              id:sessionStorage.getItem('username'),
-              page:this.page
-            }
-          }).then((res)=> {
-            if (res.data.success) {
-              this.orderApplies = res.data.data.content;
-              for (let i = 0; i < this.orderApplies.length; i++) {
-                if (this.orderApplies[i].status === 0) {
-                  this.orderApplies[i].status0 = '已保存'
-                } else if (this.orderApplies[i].status === 1) {
-                  this.orderApplies[i].status0 = '已提交'
-                } else if (this.orderList[i].status === 2) {
-                  this.orderList[i].status0 = '部门领导已通过'
-                } else {
-                  this.orderList[i].status0 = '主管领导已通过'
-                }
-              }
-            }
-          })
+          this.getOrders(this.page)
         }
       }).catch(err=>{console.log(err)})
 
@@ -192,7 +193,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$getAxios(true).delete('/order/'+row.id).then((res)=>{
+        this.$axios.delete('/order/'+row.id).then((res)=>{
           if (res.data.success){
             this.orderApplies.splice(index,1)
             this.$message(
@@ -215,63 +216,12 @@ export default {
        router.push({path:'/orderDetail',query:{id:this.orderApplies[index].id}})
     },
     currentChange(current){
-      this.$getAxios(true).get('/order/orders',{
-        params:{
-          // id:sessionStorage.getItem('username'),
-          page:current
-        }
-      }).then((res)=>{
-        this.orderApplies = res.data.data.content;
-        for(let i = 0; i <this.orderApplies.length;i++){
-          if(this.orderApplies[i].status===0) {
-            this.orderApplies[i].status0 = '已保存'
-          } else if (this.orderApplies[i].status ===1) {
-            this.orderApplies[i].status0 = '已提交'
-          } else if (this.orderApplies[i].status === 2) {
-            this.orderApplies[i].status0 = '部门领导已通过'
-          } else {
-            this.orderApplies[i].status0 = '主管领导已通过'
-          }
-        }
-      })
+      this.getOrders(current)
     }
   },
   created() {
     this.getDepartmentOptions()
-
-    this.$getAxios(true).get('/order/orders',{
-      params:{
-        // id:sessionStorage.getItem('username'),
-        page:this.page
-      }
-    }).then((res)=>{
-      if(res.data.success){
-        this.orderApplies = res.data.data.content;
-        for(let i = 0; i <this.orderApplies.length;i++){
-          if(this.orderApplies[i].status===0) {
-            this.orderApplies[i].status0 = '已保存'
-          } else if (this.orderApplies[i].status ===1) {
-            this.orderApplies[i].status0 = '已提交'
-          } else if (this.orderApplies[i].status === 2) {
-            this.orderApplies[i].status0 = '部门领导已通过'
-          } else {
-            this.orderApplies[i].status0 = '主管领导已通过'
-          }
-        }
-        this.total = res.data.data.totalElements;
-        this.page = res.data.data.number+1;
-        this.pageSize = res.data.data.pageSize;
-        this.isLoading = false
-      } else{
-        this.isLoading = false
-        this.$message(
-            {
-              message:'获取失败',
-              type: 'error'
-            }
-        )
-      }
-    })
+    this.getOrders(1)
   }
 }
 </script>

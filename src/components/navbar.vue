@@ -39,7 +39,7 @@ export default {
   data(){
     return{
       activeIndex: '1',
-      menu: JSON.parse(window.sessionStorage.getItem('menu')),
+      menu: this.$store.state.menu,
       username:'',
       showDot: false,
       noticeCount: 0,
@@ -89,9 +89,6 @@ export default {
           this.$router.push({path:'/login'})
         }
       }).catch(err=>{console.log(err)})
-
-
-
     }
   }
 }

@@ -79,7 +79,7 @@ export default {
   },
 
   created() {
-    this.$getAxios(true).get('/user/info',{
+    this.$axios.get('/user/info',{
       params:{
         id: this.$store.state.userName
       }
