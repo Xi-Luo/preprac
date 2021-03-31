@@ -47,7 +47,10 @@
   <el-table
       :data="orderApplies"
       border
-      v-loading="isLoading">
+      v-loading="isLoading"
+      show-summary
+      :summary-method="getSummaries"
+  >
     <el-table-column
         v-for="(item,index) in tableList"
         :key="index"
@@ -55,6 +58,14 @@
         :label="item.label"
         :width="item.width"
     />
+    <el-table-column
+        prop="status0"
+        label="状态"
+        width="120"
+        :filters="statusOptions"
+        :filter-method="statusFilter"
+        filter-placement="bottom-end"
+      ></el-table-column>
     <el-table-column
         label="操作"
         width="150">
@@ -106,27 +117,53 @@ export default {
         {prop:'applyUser',label:'申请人',width:'100'},
         {prop:'applyDate',label:'申请日期',width:'150'},
         {prop:'fundCode',label:'申请经费代码',width:'120'},
-        {prop:'total',label:'总金额',width:'120'},
-        {prop:'status0',label:'状态',width:'120'},
+        {prop:'total',label:'总金额',width:'120'}
+      ],
+      statusOptions:[
+        {text:'已保存',value:'已保存'},
+        {text:'已提交',value: '已提交'},
+        {text: '部门领导已通过',value: '部门领导已通过'},
+        {text: '主管领导已通过',value: '主管领导已通过'},
       ],
       isLoading: true,
       page:1,
       pageSize:2,
       total:0,
-      orderApplies:[]
+      orderApplies:[],
+
     }
   },
   methods:{
+    statusFilter(value,row){
+      return row.status0 === value
+    },
+    getSummaries(param){
+      const {columns, data} = param
+      const sums=[]
+      columns.forEach((column, index)=>{
+        if(index===0){
+          sums[index]='总价'
+          return
+        }
+        if(index===5){
+          const values = data.map(item => Number(item[column.property]))
+          sums[index]= values.reduce((prev,cur)=>{
+            return prev+cur
+          },0)
+        }
+      })
+      return sums
+    },
     getOrders(page){
       this.$axios.get('/order/orders', {
         params:{
           oid:this.searchForm.oid,
-              applyDept:this.searchForm.applyDept,
-              startDate:this.searchForm.startDate,
-              endDate:this.searchForm.endDate,
-              user:this.searchForm.user,
-              fundCode:this.searchForm.fundCode,
-              page:page
+          applyDept:this.searchForm.applyDept,
+          startDate:this.searchForm.startDate,
+          endDate:this.searchForm.endDate,
+          user:this.searchForm.user,
+          fundCode:this.searchForm.fundCode,
+          page:page
         }
       }).then((res)=>{
         if(res.data.success){

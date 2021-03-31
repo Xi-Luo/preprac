@@ -97,6 +97,7 @@ export default {
               this.$store.commit('userNameSave',this.form.username)
               this.$store.commit('menuSave', response.data.data.menu)
               this.$store.commit('roleSave',response.data.data.role)
+              this.$store.commit('deptNameSave',response.data.data.deptName)
               this.$store.commit('loginNameSave',response.data.data.loginName);
               this.$message({
                 message:'登录成功',

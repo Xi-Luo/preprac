@@ -12,6 +12,8 @@ import approval from "@/views/approval";
 import orderApprove from "@/views/orderApprove";
 import deptOrder from "@/views/deptOrder";
 import instOrder from "@/views/instOrder";
+import orderList from "@/views/orderList";
+import purchaceOrder from "@/views/purchaceOrder";
 
 Vue.use(VueRouter)
 
@@ -71,6 +73,14 @@ const router = new VueRouter({
             name: 'instOrder',
             component: instOrder
 
+        },{
+            path: '/orderlist',
+            name: 'orderList',
+            component: orderList
+        },{
+            path: '/purchaceOrder',
+            name: 'purchaceOrder',
+            component: purchaceOrder
         }
     ]
 })

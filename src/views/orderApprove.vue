@@ -45,7 +45,7 @@
         <el-button type="warning" @click="deny">拒绝</el-button>
       </div>
     </div>
-    <el-dialog title="拒绝原因" :visible.sync="denyDialog">
+    <el-dialog title="拒绝原因" :visible.sync="denyDialog" :close-on-click-modal="false">
       <el-input
           type="textarea"
           :rows="5"

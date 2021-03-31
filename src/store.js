@@ -11,9 +11,13 @@ export default new Vuex.Store({
         userName:'',
         menu:[],
         loginName:'',
-        role:''
+        role:'',
+        deptName:''
     },
     mutations:{
+        deptNameSave(state,deptName){
+            state.deptName = deptName
+        },
         tokenSave(state, token){
             state.token = token;
         },
@@ -35,9 +39,9 @@ export default new Vuex.Store({
         usernameClear(state){
             state.userName= ''
         },
-        // menuClear(state){
-        //     state.menu = ''
-        // },
+        menuClear(state){
+            state.menu = ''
+        },
         loginNameClear(state){
             state.loginName = ''
         }

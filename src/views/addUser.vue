@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <el-dialog title="添加用户" :visible.sync="dialogFormVisible" width="400px">
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="400px">
       <el-form ref="addForm" :model="addForm">
         <el-form-item label="帐号" prop="id" :label-width="formLabelWidth">
           <el-input v-model="addForm.id" autocomplete="off"></el-input>
@@ -85,7 +85,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="编辑用户" :visible.sync="editDialogVisible" width="400px">
+    <el-dialog title="编辑用户" :visible.sync="editDialogVisible" :close-on-click-modal="false" width="400px">
       <el-form ref="editForm" :model="editForm">
         <el-form-item label="帐号" prop="id" :label-width="formLabelWidth">
           <el-input v-model="editForm.id" autocomplete="off"></el-input>
@@ -123,7 +123,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="批量添加用户" :visible.sync="batchAddVisible" width="400px">
+    <el-dialog title="批量添加用户" :visible.sync="batchAddVisible" :close-on-click-modal="false" width="400px">
       <el-upload
           class="upload-demo"
           drag
@@ -134,6 +134,9 @@
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
       </el-upload>
+      <div style="margin-top: 0.5rem">
+        <el-button type="primary"  @click="downloadFile">下载批量添加模板</el-button>
+      </div>
     </el-dialog>
   </div>
 </div>
@@ -221,6 +224,35 @@ export default {
         }).catch(err=>{console.log(err)})
   },
   methods:{
+    downloadFile(){
+      this.$axios
+          .get("/admin/user/template", {
+            responseType: "blob",   //文件下载的 url 需要带上这个参数
+          })
+          .then((res) => {
+            console.log(res);
+            const { data, headers } = res;
+            const fileName = headers["content-disposition"].replace(
+                /\w+;filename=(.*)/,
+                "$1"
+            );   //根据返回头的content-disposition字段中的参数决定文件名
+            //content-type 决定文件类型
+            const blob = new Blob([data], { type: headers["content-type"] });
+            //下载文件方式：在 html 中插入一个不可见的 a 标签，将返回的文件连接到 a 标签上实现下载
+            let dom = document.createElement("a");
+            let url = window.URL.createObjectURL(blob);
+            dom.href = url;
+            dom.download = decodeURI(fileName);
+            dom.style.display = "none";
+            document.body.appendChild(dom);
+            dom.click();
+            dom.parentNode.removeChild(dom);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    },
     uploadSuccess(){
       this.$message.success('上传成功')
       this.batchAddVisible = false

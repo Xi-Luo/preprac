@@ -56,6 +56,14 @@
             :width="item.width"
         />
         <el-table-column
+            prop="status0"
+            width="120"
+            label="状态"
+            :filter-method="statusFilter"
+            :filters="statusOptions"
+            filter-placement="bottom-end"
+        ></el-table-column>
+        <el-table-column
             label="操作"
             width="120">
           <template slot-scope="scope">
@@ -107,11 +115,16 @@ export default {
         {prop:'applyUser',label:'申请人',width:'120'},
         {prop:'applyDate',label:'申请日期',width:'150'},
         {prop:'fundCode',label:'申请经费代码',width:'120'},
-        {prop:'total',label:'总金额',width:'120'},
-        {prop:'status0',label:'状态',width:'120'},
+        {prop:'total',label:'总金额',width:'120'}
       ],
       isLoading: true,
-      orderList:[]
+      orderList:[],
+      statusOptions:[
+        {text:'已保存',value:'已保存'},
+        {text:'已提交',value: '已提交'},
+        {text: '部门领导已通过',value: '部门领导已通过'},
+        {text: '主管领导已通过',value: '主管领导已通过'},
+      ],
     }
   },
   created() {
@@ -119,6 +132,9 @@ export default {
     this.getOrderList(1)
   },
   methods:{
+    statusFilter(value, row){
+      return row.status0 ===value
+    },
     getDepartmentOptions(){
       this.$getAxios(true).get('/department/departments')
           .then((res)=>{

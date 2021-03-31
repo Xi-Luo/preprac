@@ -86,6 +86,7 @@ export default {
           this.$store.commit('tokenClear')
           this.$store.commit('usernameClear')
           this.$store.commit('loginNameClear')
+          this.$store.commit('menuClear')
           this.$router.push({path:'/login'})
         }
       }).catch(err=>{console.log(err)})
