@@ -84,7 +84,8 @@ export default {
       multipleSelection:[],
       rule:{
         uid:[{validator:validateEmpty,trigger:'blur'}]
-      }
+      },
+      multipleId:[]
     }
   },
   created() {
@@ -95,7 +96,7 @@ export default {
       this.$refs['purchaceForm'].validate((valid)=>{
         if(valid){
           this.$axios.post('/admin/purchace',{
-            orderLists:this.multipleSelection,
+            orderLists:this.multipleId,
             uid :this.purchaceForm.uid
           }).then(res=>{
             console.log(res)
@@ -105,6 +106,7 @@ export default {
               this.$message.error('操作失败')
             }
           }).catch(err=>{console.log(err)})
+          this.packageDialog = false
         }
       })
 
@@ -127,8 +129,10 @@ export default {
     },
     handleSelectionChange(val){
       this.multipleSelection = val
-
-      console.log('this is ms',this.multipleSelection)
+      this.multipleId = []
+      for(let item in this.multipleSelection){
+        this.multipleId.push(this.multipleSelection[item].id)
+      }
     }
   }
 }

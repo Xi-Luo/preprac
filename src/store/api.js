@@ -34,19 +34,36 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
     response=>{
-         if (response.data.success) {
-            if (response.headers.authorization!= undefined) {
-                store.commit("tokenSave",response.headers.authorization)
+        if(response.status===200){
+            if(response.data.success===undefined){
+                return Promise.resolve(response)
+            }else if(response.data.success){
+                if (response.headers.authorization!= undefined) {
+                    store.commit("tokenSave",response.headers.authorization)
+                }
+                return Promise.resolve(response)
             }
-             return Promise.resolve(response)
-         } else {
+        }else {
             element.Message({
                 type:"error",
                 message:response.data.msg,
                 duration: 3000
             })
             return Promise.reject(response)
-         }
+        }
+         // if (response.data.success) {
+         //    if (response.headers.authorization!= undefined) {
+         //        store.commit("tokenSave",response.headers.authorization)
+         //    }
+         //     return Promise.resolve(response)
+         // } else {
+         //    element.Message({
+         //        type:"error",
+         //        message:response.data.msg,
+         //        duration: 3000
+         //    })
+         //    return Promise.reject(response)
+         // }
     },
     error => {
         element.Message({
