@@ -14,7 +14,7 @@
             {{orderApply.applyDate}}
           </el-form-item>
           <el-form-item label="申请部门">
-            <el-select v-model="orderApply.applyDepartment" placeholder="请选择">
+            <el-select v-model="orderApply.applyDepartment" :disabled="!saveDisabled" placeholder="请选择">
               <el-option
                   v-for="item in departmentOptions"
                   :key="item.id"
@@ -24,7 +24,13 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="applyUser" label="申请人">
-            <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
+            <el-autocomplete
+                :disabled="!saveDisabled"
+                v-model="orderApply.applyUser"
+                :fetch-suggestions="querySearchAsync"
+                placeholder="请输入申请人"
+                @select="handleSelect"
+            ></el-autocomplete>
           </el-form-item>
           <el-form-item label="采购总金额">
             {{orderApply.total}}
@@ -34,8 +40,9 @@
           </el-form-item>
         </el-form>
       </div>
-      <div style="margin:0 1rem">
+      <div style="display: table;margin:0 auto">
         <el-table
+            max-height="530px"
             border
             :data="orderApply.orderLists">
           <el-table-column
@@ -47,23 +54,24 @@
           >
           </el-table-column>
           <el-table-column
+              v-if="saveDisabled"
               fixed="right"
               label="操作"
               width="150">
             <template slot-scope="scope">
               <el-button
                   size="mini"
-                  @click="handleEdit(scope.$index, scope.row)" :disabled="saveDisabled">编辑</el-button>
+                  @click="handleEdit(scope.$index, scope.row)" >编辑</el-button>
               <el-button
                   size="mini"
                   type="danger"
-                  @click="handleDelete(scope.$index, scope.row)" :disabled="saveDisabled">删除</el-button>
+                  @click="handleDelete(scope.$index, scope.row)" >删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
 
-      <div style="width: 300px;margin:1rem">
+      <div style="width: 300px;margin:1rem" v-if="this.$store.state.loginName===this.orderApply.applyUser">
         <el-upload
             class="upload-demo"
             action="http://localhost:8080/order/file"
@@ -77,20 +85,12 @@
           </div>
         </el-upload>
       </div>
-    <el-form :inline="true" style="float: right" class="form">
-      <el-form-item>
+      <div style="text-align: right;margin: 1rem">
         <el-button v-if="orderApply.hasFile" @click="downloadPhoto">下载申请单图片</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button  @click="addItem('newForm')" :disabled="saveDisabled">添加物资条款</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="success" plain style="float: right" @click="print">打印</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="save" style="float: right" :disabled="saveDisabled">提交</el-button>
-      </el-form-item>
-    </el-form>
+        <el-button  @click="addItem('newForm')" v-if="saveDisabled">添加物资条款</el-button>
+        <el-button type="success" plain  @click="print">打印</el-button>
+        <el-button type="primary" @click="save"  v-if="saveDisabled">提交</el-button>
+      </div>
 
     <el-dialog title="编辑" width="550px" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <el-form ref="form" :rules="newFormRules" :model="form">
@@ -126,7 +126,12 @@
           <el-input type="textarea" :rows="5" v-model="form.reason" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
-          <el-input v-model="form.newUser" autocomplete="off"></el-input>
+          <el-autocomplete
+              v-model="form.newUser"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入新设备使用人"
+              @select="handleSelect"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -169,7 +174,12 @@
           <el-input type="textarea" :rows="6" v-model="newForm.reason" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
-          <el-input v-model="newForm.newUser" autocomplete="off"></el-input>
+          <el-autocomplete
+              v-model="newForm.newUser"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入新设备使用人"
+              @select="handleSelect"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -250,6 +260,7 @@ export default {
       }
     }
     return {
+
       unitOptions:[
         {
           id:0,
@@ -276,7 +287,7 @@ export default {
         {prop:'budgetUnitPrice',label: '预算单价',width: '80'},
         {prop:'budgetTotalPrice',label: '预算总价',width: '80'},
         {prop:'reason',label: '申请原因(请详细列明申购理由，并阐述采购必要性，要求不少于100字，如有旧设备，请列明)',width: '240'},
-        {prop: 'newUser',label: '新设备使用人',width: '100'}
+        {prop: 'newUser',label: '新设备使用人',width: '80'}
       ],
       saveDisabled:false,
       formQuantity:0,
@@ -343,6 +354,25 @@ export default {
   },
 
   methods: {
+    querySearchAsync(queryString,cb){
+      this.$axios.get('/user/search',{
+        params:{
+          name:queryString
+        }
+      }).then(res=>{
+        console.log('rrrrrrrres', res)
+        let newUsers =[]
+        for(let i = 0; i<res.data.data.length;i++){
+          let tmp = {}
+          tmp.value = res.data.data[i].username
+          newUsers.push(tmp)
+        }
+        cb(newUsers)
+      })
+    },
+    handleSelect(item){
+      console.log(item)
+    },
     downloadPhoto(){
       this.$axios
           .get("/order/file/download", {
@@ -380,26 +410,31 @@ export default {
     },
     initData () {
       // 获取部门列表
-      this.$getAxios(true).get('/department/departments')
+      this.$axios.get('/department/departments')
           .then((res)=>{
             this.departmentOptions = res.data.data
           }).catch(err=>{console.log(err)})
       this.orderApply.uid = this.$store.state.userName
 
-
-      this.$getAxios(true).get('/order',{
+      console.log('this is init')
+      this.$axios.get('/order',{
         params:{
           id:this.$route.query.id
         }
       }).then(
           (res)=>{
             if(res.data.success){
+              console.log('before',this.saveDisabled)
               this.orderApply = res.data.data
               if(this.orderApply.status===0) {
                 this.orderApply.status0 = '已保存'
-              } else if (this.orderApply.status ===1) {
-                this.orderApply.status0 = '已提交'
                 this.saveDisabled = true
+              } else if (this.orderApply.status===1) {
+                this.orderApply.status0 = '已提交'
+              } else if (this.orderApply.status===2){
+                this.orderApply.status0 = '部门领导已通过'
+              } else if(this.orderApply.status===3){
+                this.orderApply.status0 = '主管领导已通过'
               }
             }
           }
@@ -473,7 +508,7 @@ export default {
       this.$refs['orderApply'].validate((valid)=>{
         if(valid){
           this.orderApply.status=1
-          this.$getAxios(true).put('/order',this.orderApply).then(res=>{
+          this.$axios.put('/order',this.orderApply).then(res=>{
             console.log('res',res.data)
             if (res.data.success) {
               this.$message({

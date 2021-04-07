@@ -47,7 +47,6 @@ export default {
     }
   },
   created() {
-    // this.menu = this.$store.state.menu;
     this.username = this.$store.state.userName
     this.$getAxios(true).get("/notice/count",{
       params:{

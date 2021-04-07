@@ -2,7 +2,7 @@
 import axios from 'axios'
 import element from 'element-ui'
 import store from '../store'
-
+import router from "@/router";
 export {service}
 let service = axios.create({
     baseURL:'http://localhost:8080',
@@ -49,21 +49,9 @@ service.interceptors.response.use(
                 message:response.data.msg,
                 duration: 3000
             })
+            router.push({path:'/login'}).then()
             return Promise.reject(response)
         }
-         // if (response.data.success) {
-         //    if (response.headers.authorization!= undefined) {
-         //        store.commit("tokenSave",response.headers.authorization)
-         //    }
-         //     return Promise.resolve(response)
-         // } else {
-         //    element.Message({
-         //        type:"error",
-         //        message:response.data.msg,
-         //        duration: 3000
-         //    })
-         //    return Promise.reject(response)
-         // }
     },
     error => {
         element.Message({

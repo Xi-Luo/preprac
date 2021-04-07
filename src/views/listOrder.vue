@@ -38,6 +38,16 @@
       <el-form-item label="申请人:">
         <el-input v-model="searchForm.user" style="width: 6rem"></el-input>
       </el-form-item>
+      <el-form-item label="状态:">
+        <el-select v-model="searchForm.status" placeholder="请选择" style="width: 10rem" >
+          <el-option
+              v-for="item in statusOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-button type="warning" @click="clearForm">重置</el-button>
       <el-button type="primary" @click="search" >搜索</el-button>
     </el-form>
@@ -109,7 +119,8 @@ export default {
         startDate:'',
         endDate:'',
         user:'',
-        fundCode:''
+        fundCode:'',
+        status:''
       },
       tableList:[
         {prop:'id',label:'编号',width:'100'},
@@ -130,7 +141,19 @@ export default {
       pageSize:2,
       total:0,
       orderApplies:[],
-
+      statusOption:[{
+        value:0,
+        label:'已保存'
+      },{
+        value:1,
+        label:'已提交'
+      },{
+        value:2,
+        label:'部门领导已通过'
+      },{
+        value:3,
+        label:'主管领导已通过'
+      }]
     }
   },
   methods:{
@@ -166,6 +189,8 @@ export default {
           page:page
         }
       }).then((res)=>{
+        console.log('this is res ', res)
+        console.log('this is searchform', this.searchForm)
         if(res.data.success){
           this.orderApplies = res.data.data.content;
           for(let i = 0; i <this.orderApplies.length;i++){

@@ -14,7 +14,19 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="applyUser" label="申请人">
-            <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>
+            <el-autocomplete
+                popper-class="my-autocomplete"
+                v-model="orderApply.applyUser"
+                :fetch-suggestions="querySearchAsync"
+                placeholder="请输入申请人"
+                @select="handleSelect"
+            >
+<!--              <template slot-scope="{ item }">-->
+<!--                <div class="name">{{ item.value }}</div>-->
+<!--                <span class="department">{{ item.department }}</span>-->
+<!--              </template>-->
+            </el-autocomplete>
+<!--            <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>-->
           </el-form-item>
           <el-form-item prop="fundCode" label="采购经费代码">
             <el-input style="width: 10vw" placeholder="采购经费代码" v-model="orderApply.fundCode"></el-input>
@@ -26,8 +38,10 @@
     </div>
     <div style="display: table;margin:0 auto">
       <el-table
+          max-height="530px"
           border
-          :data="orderApply.orderLists">
+          :data="orderApply.orderLists"
+      >
         <el-table-column
             v-for="(item,index) in tableList"
             :key="index"
@@ -51,17 +65,12 @@
         </el-table-column>
       </el-table>
     </div>
-    <div>
-      <el-form :inline="true" style="float: right" class="form">
-        <el-form-item>
-          <el-button  @click="addItem('newForm')">添加物资条款</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="saveOrder" type="primary" >提交</el-button>
-        </el-form-item>
-      </el-form>
+    <div >
+      <div style="float: right;margin: 1rem">
+        <el-button  @click="addItem('newForm')">添加物资条款</el-button>
+        <el-button @click="saveOrder" type="primary" >提交</el-button>
+      </div>
     </div>
-
     <el-dialog title="编辑" width="550px" :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <el-form :model="form" ref="form" :rules="newFormRules">
         <el-form-item prop="name" label="物资名称" :label-width="formLabelWidth">
@@ -96,7 +105,12 @@
           <el-input type="textarea" :rows="6" v-model="form.reason" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
-          <el-input v-model="form.newUser" autocomplete="off"></el-input>
+          <el-autocomplete
+              v-model="form.newUser"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入新设备使用人"
+              @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -139,7 +153,12 @@
           <el-input type="textarea" :rows="6" v-model="newForm.reason" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
-          <el-input v-model="newForm.newUser" autocomplete="off"></el-input>
+          <el-autocomplete
+              v-model="newForm.newUser"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入新设备使用人"
+              @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -310,6 +329,26 @@ export default {
     }
   },
   methods: {
+    querySearchAsync(queryString,cb){
+      this.$axios.get('/user/search',{
+        params:{
+          name:queryString
+        }
+      }).then(res=>{
+        console.log('this is res ',res)
+        let newUsers =[]
+        for(let i = 0; i<res.data.data.length;i++){
+          let tmp = {}
+          tmp.value = res.data.data[i].username
+          tmp.department = res.data.data[i].department
+          newUsers.push(tmp)
+        }
+        cb(newUsers)
+      })
+    },
+    handleSelect(item){
+      console.log('this is handleS item',item)
+    },
     init(){
       this.$axios.get('/department/departments')
           .then((res)=>{
@@ -376,7 +415,7 @@ export default {
     saveOrder(){
       this.$refs['orderApply'].validate((valid)=>{
         if(valid){
-          this.$getAxios(true).post('/order',this.orderApply
+          this.$axios.post('/order',this.orderApply
           ).then((res)=>{
             if (res.data.success){
               this.$message({
@@ -463,5 +502,23 @@ input::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;}
+.my-autocomplete {
+li {
+  line-height: normal;
+  padding: 7px;
 
+.name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.department {
+  font-size: 12px;
+  color: #b4b4b4;
+}
+
+.highlighted .addr {
+  color: #ddd;
+}
+}
+}
 </style>

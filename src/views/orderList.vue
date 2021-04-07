@@ -2,9 +2,9 @@
   <div>
     <navbar></navbar>
     <div style="padding-top: 65px;">
-      <div style="margin:0 1rem">
+      <div style="display:table;margin:0 auto">
         <el-table
-            max-height="530px"
+            max-height="520"
             :data="orderList"
             border
             @selection-change="handleSelectionChange"
@@ -13,8 +13,7 @@
               width="40"
               type="selection"
               fixed="left"
-          >
-          </el-table-column>
+          ></el-table-column>
           <el-table-column
               v-for="(item,index) in tableList"
               :key="index"
@@ -22,6 +21,7 @@
               :prop="item.prop"
               :label="item.label"
           ></el-table-column>
+
         </el-table>
       </div>
       <div style="text-align: right;margin-top: 1rem;margin-right: 1rem">
@@ -31,8 +31,13 @@
 
     <el-dialog title="形成采购单" width="400px" :visible.sync="packageDialog" :close-on-click-modal="false">
       <el-form ref="purchaceForm" :rules="rule" :model="purchaceForm">
-        <el-form-item prop="uid" label="申请人帐号" label-width="90px">
-          <el-input v-model="purchaceForm.uid" placeholder="请输入申请人帐号"></el-input>
+        <el-form-item prop="uid" label="申请人用户名" label-width="100px">
+          <el-autocomplete
+              v-model="purchaceForm.uid"
+              :fetch-suggestions="querySearchAsync"
+              placeholder="请输入新设备使用人"
+              :trigger-on-focus="false"
+          ></el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -85,13 +90,33 @@ export default {
       rule:{
         uid:[{validator:validateEmpty,trigger:'blur'}]
       },
-      multipleId:[]
+      multipleId:[],
     }
   },
   created() {
     this.getOrderList()
   },
   methods:{
+    // handleSelect(item){
+    //
+    //
+    // },
+    querySearchAsync(queryString,cb){
+      this.$axios.get('/admin/user/users/info',{
+        params:{
+          username:queryString
+        }
+      }).then(res=>{
+        console.log('this is res data data',res.data.data)
+        let newUsers =[]
+        for(let i = 0; i<res.data.data.length;i++){
+          let tmp = {}
+          tmp.value = res.data.data[i].username
+          newUsers.push(tmp)
+        }
+        cb(newUsers)
+      })
+    },
     packageConfirm(){
       this.$refs['purchaceForm'].validate((valid)=>{
         if(valid){
@@ -109,13 +134,16 @@ export default {
           this.packageDialog = false
         }
       })
-
     },
     getPackage(){
-      this.packageDialog = true
-      this.$nextTick(()=>{
-        this.$refs['purchaceForm'].resetFields()
-      })
+      if(this.multipleId.length===0){
+        this.$message.warning('您还没有选中设备')
+      }else{
+        this.packageDialog = true
+        this.$nextTick(()=>{
+          this.$refs['purchaceForm'].resetFields()
+        })
+      }
     },
     getOrderList(){
       this.$axios.get('/orderlist/all',{

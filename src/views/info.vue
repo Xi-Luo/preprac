@@ -6,10 +6,11 @@
         <div slot="header" class="clearfix">
           <span>用户信息</span>
         </div>
-        <el-form ref="form" :model="form" label-width="90px" :rules="rules">
+        <el-form ref="form" :model="form" label-width="120px" :rules="rules">
           <el-form-item label="帐号:">{{user.id}}</el-form-item>
           <el-form-item label="用户名:">{{user.username}}</el-form-item>
           <el-form-item label="所属部门:">{{user.department}}</el-form-item>
+          <el-form-item label="是否采购负责人" >{{user.inCharge0}}</el-form-item>
           <el-form-item label="旧密码" prop="oldPass">
             <el-input v-model="form.oldPass" show-password></el-input>
           </el-form-item>
@@ -109,6 +110,11 @@ export default {
       if(res.data.success){
         console.log('this is res', res)
         this.user=res.data.data
+        if(this.user.inCharge===true){
+          this.user.inCharge0 = '是'
+        }else {
+          this.user.inCharge0 = '否'
+        }
       }
     })
   }

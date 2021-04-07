@@ -93,8 +93,8 @@
         <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
           <el-input v-model="editForm.username" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
-          <el-input v-model="editForm.password" autocomplete="off"></el-input>
+        <el-form-item label="密码" prop="password" :label-width="formLabelWidth" >
+          <el-input v-model="editForm.password" autocomplete="off" show-password></el-input>
         </el-form-item>
         <el-form-item label="部门" prop="department" :label-width="formLabelWidth">
           <el-select v-model="editForm.department" placeholder="请选择">
@@ -119,6 +119,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button @click="chargeMan" type="warning">任命为采购负责人</el-button>
         <el-button type="primary" @click="editConfirm">确 定</el-button>
       </div>
     </el-dialog>
@@ -196,19 +197,27 @@ export default {
         {prop:'id',label:'帐号',width:'120'},
         {prop:'username',label: '用户名',width:'120'},
         {prop:"department",label:"部门",width:"120"},
-        {prop:"role",label:"职位",width:"120"}
+        {prop:"role",label:"职位",width:"120"},
+        {prop: 'inCharge0',label: '是否采购负责人', width: '120'}
       ],
       userList:[]
     }
   },
   created() {
-    this.$getAxios(true).get('/admin/user/users',{
+    this.$axios.get('/admin/user/users',{
       params:{
         page:this.page
       }
     }).then(res=>{
       if(res.data.success){
         this.userList = res.data.data.content
+        for(let i = 0; i<this.userList.length;i++){
+          if(this.userList[i].inCharge===false){
+            this.userList[i].inCharge0 = '否'
+          }else{
+            this.userList[i].inCharge0 = '是'
+          }
+        }
         this.total = res.data.data.totalElements
         this.page = res.data.data.number+1;
         this.isLoading = false
@@ -218,12 +227,26 @@ export default {
       }
     }).catch(err=>{console.log(err)})
 
-    this.$getAxios(true).get('/department/departments')
+    this.$axios.get('/department/departments')
         .then((res)=>{
           this.departmentOptions = res.data.data
         }).catch(err=>{console.log(err)})
   },
   methods:{
+    chargeMan(){
+      this.$axios.get('/admin/user/appointment',{
+        params:{
+          username:this.editForm.id
+        }
+      }).then((res)=>{
+        console.log(res)
+        if(res.data.success){
+          this.$message.success('任命成功')
+        }else{
+          this.$message.error('任命失败')
+        }
+      })
+    },
     downloadFile(){
       this.$axios
           .get("/admin/user/template", {
