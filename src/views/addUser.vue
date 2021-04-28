@@ -48,7 +48,7 @@
     </div>
 
     <el-dialog title="添加用户" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="400px">
-      <el-form ref="addForm" :model="addForm">
+      <el-form ref="addForm" :rules="addRules" :model="addForm">
         <el-form-item label="帐号" prop="id" :label-width="formLabelWidth">
           <el-input v-model="addForm.id" autocomplete="off"></el-input>
         </el-form-item>
@@ -151,6 +151,13 @@ export default {
     navbar
   },
   data(){
+    let validateEmpty = (rule, value, callback) => {
+      if(value===''){
+        callback(new Error('该字段不能为空'))
+      } else {
+        callback()
+      }
+    }
     return{
       batchAddVisible: false,
       editDialogVisible: false,
@@ -200,7 +207,14 @@ export default {
         {prop:"role",label:"职位",width:"120"},
         {prop: 'inCharge0',label: '是否采购负责人', width: '120'}
       ],
-      userList:[]
+      userList:[],
+      addRules:{
+        id:{validator:validateEmpty,trigger:'blur'},
+        username:{validator:validateEmpty,trigger:'blur'},
+        department:{validator:validateEmpty,trigger:'blur'},
+        password:{validator:validateEmpty,trigger:'blur'},
+        role:{validator:validateEmpty,trigger:'blur'}
+      }
     }
   },
   created() {
@@ -342,14 +356,18 @@ export default {
 
     },
     addConfirm(){
-      this.$getAxios(true).post('/admin/user',this.addForm)
-      .then(res=>{
-        if (res.data.success){
-          this.$message.success('添加成功')
-        }else {
-          this.$message.error('添加失败')
+      this.$refs['addForm'].validate((valid)=>{
+        if(valid){
+          this.$getAxios(true).post('/admin/user',this.addForm)
+              .then(res=>{
+                if (res.data.success){
+                  this.$message.success('添加成功')
+                }else {
+                  this.$message.error('添加失败')
+                }
+                this.dialogFormVisible = false
+              })
         }
-        this.dialogFormVisible = false
       })
     },
     addOpen(formName){

@@ -25,12 +25,18 @@
           </el-form-item>
           <el-form-item prop="applyUser" label="申请人">
             <el-autocomplete
-                :disabled="!saveDisabled"
+                popper-class="my-autocomplete"
                 v-model="orderApply.applyUser"
+                :trigger-on-focus="false"
                 :fetch-suggestions="querySearchAsync"
                 placeholder="请输入申请人"
                 @select="handleSelect"
-            ></el-autocomplete>
+            >
+              <template slot-scope="{ item }">
+                <span class="name">{{ item.value }}</span>
+                <span class="department">{{ item.department }}</span>
+              </template>
+            </el-autocomplete>
           </el-form-item>
           <el-form-item label="采购总金额">
             {{orderApply.total}}
@@ -127,11 +133,18 @@
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
           <el-autocomplete
+              popper-class="my-autocomplete"
               v-model="form.newUser"
+              :trigger-on-focus="false"
               :fetch-suggestions="querySearchAsync"
-              placeholder="请输入新设备使用人"
+              placeholder="请输入申请人"
               @select="handleSelect"
-          />
+          >
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value }}</span>
+              <span class="department">{{ item.department }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -175,11 +188,18 @@
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
           <el-autocomplete
+              popper-class="my-autocomplete"
               v-model="newForm.newUser"
+              :trigger-on-focus="false"
               :fetch-suggestions="querySearchAsync"
-              placeholder="请输入新设备使用人"
+              placeholder="请输入申请人"
               @select="handleSelect"
-          />
+          >
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value }}</span>
+              <span class="department">{{ item.department }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -345,10 +365,10 @@ export default {
         quantity:[{validator:validateZero, trigger:'blur'}],
         budgetUnitPrice:[{validator:validateZero, trigger:'blur'}],
         reason:[{validator:validateEmpty, trigger:'blur'}],
-        newUser:[{validator:validateEmpty, trigger:'blur'}]
+        newUser:[{validator:validateEmpty, change:'blur'}]
       },
       orderRules:{
-        applyUser: [{validator:validateEmpty, trigger:'blur'}]
+        applyUser: [{validator:validateEmpty, change:'blur'}]
       }
     }
   },
@@ -633,17 +653,25 @@ export default {
 }
 </script>
 
-<style>
-.form{
-  margin-top: 10px;
+<style lang="scss">
+.my-autocomplete {
+  li {
+    line-height: normal;
+    padding: 7px;
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .department {
+      font-size: 12px;
+      color: #b4b4b4;
+      padding-top: 0;
+    }
+    .highlighted .department {
+      color: #ddd;
+    }
+  }
 }
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none !important;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;}
 
 </style>

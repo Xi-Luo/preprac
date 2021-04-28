@@ -43,7 +43,7 @@
           <el-option
               v-for="item in statusOptions"
               :key="item.value"
-              :label="item.label"
+              :label="item.text"
               :value="item.value">
           </el-option>
         </el-select>
@@ -68,14 +68,6 @@
         :label="item.label"
         :width="item.width"
     />
-    <el-table-column
-        prop="status0"
-        label="状态"
-        width="120"
-        :filters="statusOptions"
-        :filter-method="statusFilter"
-        filter-placement="bottom-end"
-      ></el-table-column>
     <el-table-column
         label="操作"
         width="150">
@@ -128,38 +120,23 @@ export default {
         {prop:'applyUser',label:'申请人',width:'100'},
         {prop:'applyDate',label:'申请日期',width:'150'},
         {prop:'fundCode',label:'申请经费代码',width:'120'},
-        {prop:'total',label:'总金额',width:'120'}
+        {prop:'total',label:'总金额',width:'120'},
+        {prop: 'status0',label: '状态', width: '120'}
       ],
       statusOptions:[
-        {text:'已保存',value:'已保存'},
-        {text:'已提交',value: '已提交'},
-        {text: '部门领导已通过',value: '部门领导已通过'},
-        {text: '主管领导已通过',value: '主管领导已通过'},
+        {text:'已保存',value:0},
+        {text:'已提交',value: 1},
+        {text: '部门领导已通过',value: 2},
+        {text: '主管领导已通过',value: 3},
       ],
       isLoading: true,
       page:1,
       pageSize:2,
       total:0,
-      orderApplies:[],
-      statusOption:[{
-        value:0,
-        label:'已保存'
-      },{
-        value:1,
-        label:'已提交'
-      },{
-        value:2,
-        label:'部门领导已通过'
-      },{
-        value:3,
-        label:'主管领导已通过'
-      }]
+      orderApplies:[]
     }
   },
   methods:{
-    statusFilter(value,row){
-      return row.status0 === value
-    },
     getSummaries(param){
       const {columns, data} = param
       const sums=[]
@@ -178,6 +155,7 @@ export default {
       return sums
     },
     getOrders(page){
+      console.log('this is searchform', this.searchForm)
       this.$axios.get('/order/orders', {
         params:{
           oid:this.searchForm.oid,
@@ -186,11 +164,13 @@ export default {
           endDate:this.searchForm.endDate,
           user:this.searchForm.user,
           fundCode:this.searchForm.fundCode,
+          status:this.searchForm.status,
           page:page
         }
       }).then((res)=>{
+
         console.log('this is res ', res)
-        console.log('this is searchform', this.searchForm)
+
         if(res.data.success){
           this.orderApplies = res.data.data.content;
           for(let i = 0; i <this.orderApplies.length;i++){

@@ -21,12 +21,11 @@
                 placeholder="请输入申请人"
                 @select="handleSelect"
             >
-<!--              <template slot-scope="{ item }">-->
-<!--                <div class="name">{{ item.value }}</div>-->
-<!--                <span class="department">{{ item.department }}</span>-->
-<!--              </template>-->
+              <template slot-scope="{ item }">
+                <span class="name">{{ item.value }}</span>
+                <span class="department">{{ item.department }}</span>
+              </template>
             </el-autocomplete>
-<!--            <el-input style="width: 10vw" placeholder="申请人" v-model="orderApply.applyUser"></el-input>-->
           </el-form-item>
           <el-form-item prop="fundCode" label="采购经费代码">
             <el-input style="width: 10vw" placeholder="采购经费代码" v-model="orderApply.fundCode"></el-input>
@@ -106,11 +105,17 @@
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
           <el-autocomplete
+              popper-class="my-autocomplete"
               v-model="form.newUser"
               :fetch-suggestions="querySearchAsync"
-              placeholder="请输入新设备使用人"
+              placeholder="请输入申请人"
               @select="handleSelect"
-          ></el-autocomplete>
+          >
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value }}</span>
+              <span class="department">{{ item.department }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -154,11 +159,18 @@
         </el-form-item>
         <el-form-item prop="newUser" label="新设备使用人" :label-width="formLabelWidth">
           <el-autocomplete
+              popper-class="my-autocomplete"
               v-model="newForm.newUser"
+              :trigger-on-focus="false"
               :fetch-suggestions="querySearchAsync"
-              placeholder="请输入新设备使用人"
+              placeholder="请输入申请人"
               @select="handleSelect"
-          ></el-autocomplete>
+          >
+            <template slot-scope="{ item }">
+              <span class="name">{{ item.value }}</span>
+              <span class="department">{{ item.department }}</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -319,11 +331,11 @@ export default {
         quantity:[{validator:validateZero, trigger:'blur'}],
         budgetUnitPrice:[{validator:validateZero, trigger:'blur'}],
         reason:[{validator:validateEmpty, trigger:'blur'}],
-        newUser:[{validator:validateEmpty, trigger:'blur'}]
+        newUser:[{validator:validateEmpty, change:'blur'}]
       },
       orderRules:{
         applyDepartment: [{validator:validateEmpty, trigger:'blur'}],
-        applyUser: [{validator:validateEmpty, trigger:'blur'}],
+        applyUser: [{validator:validateEmpty, change:'blur'}],
         fundCode: [{validator:validateEmpty, trigger:'blur'}]
       }
     }
@@ -341,6 +353,7 @@ export default {
           let tmp = {}
           tmp.value = res.data.data[i].username
           tmp.department = res.data.data[i].department
+          console.log('this is tmp',tmp)
           newUsers.push(tmp)
         }
         cb(newUsers)
@@ -490,35 +503,23 @@ export default {
 }
 </script>
 
-<style>
-.form{
-  margin-top: 10px;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none !important;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;}
+<style lang="scss">
 .my-autocomplete {
-li {
-  line-height: normal;
-  padding: 7px;
-
-.name {
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-.department {
-  font-size: 12px;
-  color: #b4b4b4;
-}
-
-.highlighted .addr {
-  color: #ddd;
-}
-}
+  li {
+    line-height: normal;
+    padding: 7px;
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .department {
+      font-size: 12px;
+      color: #b4b4b4;
+      padding-top: 0;
+    }
+    .highlighted .department {
+      color: #ddd;
+    }
+  }
 }
 </style>

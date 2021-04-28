@@ -35,13 +35,20 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     response=>{
         if(response.status===200){
-            if(response.data.success===undefined){
+            if(response.data.success===undefined){//当请求回来的是文件时不存在success字段
                 return Promise.resolve(response)
-            }else if(response.data.success){
+            }else if(response.data.success){//当请求回来成功时
                 if (response.headers.authorization!= undefined) {
                     store.commit("tokenSave",response.headers.authorization)
                 }
                 return Promise.resolve(response)
+            }else {//当请求回来失败时
+                element.Message({
+                    type:"error",
+                    message:response.data.msg,
+                    duration: 3000
+                })
+                return Promise.reject(response)
             }
         }else {
             element.Message({
