@@ -15,11 +15,17 @@ import instOrder from "@/views/instOrder";
 import orderList from "@/views/orderList";
 import purchaceOrder from "@/views/purchaceOrder";
 import departmentManage from "@/views/departmentManage";
+import codeManage from "@/views/codeManage";
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
     routes:[
+        {
+            path:'/code',
+            name: 'code',
+            component: codeManage
+        },
         {
             path:'/department',
             name: 'department',

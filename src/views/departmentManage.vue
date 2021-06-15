@@ -137,6 +137,19 @@ export default {
     },
     handleDelete(index,row){
       console.log(index,row)
+      this.$confirm('删除部门将移除部门内所有用户，确定要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios.delete('/admin/department/'+row.id)
+            .then(res=>{
+              if(res.data.success){
+                this.$message.success('删除成功')
+                this.getDepartments()
+              }
+            }).catch(err=>{console.log(err)})
+      }).catch();
     },
     getDepartments(){
       this.$axios.get('/department/departments')

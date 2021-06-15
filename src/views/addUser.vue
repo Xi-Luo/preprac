@@ -319,6 +319,7 @@ export default {
         console.log(res)
         if (res.data.success){
           this.$message.success('修改成功')
+          this.getUsers(1)
         }else{
           this.$message.error('修改失败')
         }

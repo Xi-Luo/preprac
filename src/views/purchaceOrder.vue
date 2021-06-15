@@ -5,11 +5,31 @@
     </div>
     <div style="display: table;margin:0 auto">
       <el-table
-          height="80vh"
-          border
           :data="purchaceOrders"
-          @selection-change="handleSelectionChange"
-      >
+          style="width: 100%">
+        <el-table-column type="expand">
+          <template slot-scope="props">
+            <el-table
+                border
+              :data="props.row.orderLists">
+              <el-table-column
+                  v-for="item in expandTable"
+                  :key="item.prop"
+                  :prop="item.prop"
+                  :label="item.label"
+                  :width="item.width"
+              ></el-table-column>
+            </el-table>
+          </template>
+        </el-table-column>
+        <el-table-column
+            v-for="item in tableList"
+            :key="item.prop"
+            :prop="item.prop"
+            :label="item.label"
+            :width="item.width"
+          ></el-table-column>
+
 
       </el-table>
     </div>
@@ -31,12 +51,44 @@ export default {
       dialogFormVisible:false,
       purchaceOrders:[],
       multipleSelection:[],
-      tableList:[]
+      tableList:[
+        {prop:'id',label:'序号',width:'100'},
+        {prop:'uid',label: '采购人', width: '180'},
+        {prop:'createTime',label:'创建时间',width:'180'},
+        {prop:'status0', label: '状态', width: '120'},
+        {prop: 'updateTime', label: '更新时间', width: '180'}
+      ],
+      expandTable:[
+        {prop:'id',label:'序号',width:'110'},
+        {prop:'name',label:'物资名称',width:'100'},
+        {prop:'type',label:'品牌型号',width:'100'},
+        {prop:'configuration',label:'配置或技术参数',width:'240'},
+        {prop:'unit',label:'单位',width:'50'},
+        {prop:'quantity',label:'数量',width:'50'},
+        {prop:'budgetUnitPrice',label: '预算单价',width: '80'},
+        {prop:'budgetTotalPrice',label: '预算总价',width: '80'},
+        {prop:'reason',label: '申请原因',width: '240'},
+        {prop: 'newUser',label: '新设备使用人',width: '80'}
+      ]
     }
   },
   created() {
+    this.getOrders()
   },
   methods:{
+    handleSelectionChange(){},
+    getOrders(){
+      this.$axios.get('/user/purchace/purchaces',{
+        params:{
+          page:1
+        }
+      }).then(res=>{
+        if(res.data.success){
+          console.log(res.data.data)
+          this.purchaceOrders = res.data.data.content
+        }
+      }).catch(err=>{console.log(err)})
+    }
   }
 }
 </script>
