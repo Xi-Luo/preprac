@@ -48,6 +48,9 @@ service.interceptors.response.use(
                     message:response.data.msg,
                     duration: 3000
                 })
+                if(response.data.msg==='token失效，请重新登录'){
+                    router.push({path:'/login'}).then()
+                }
                 return Promise.reject(response)
             }
         }else {
@@ -61,9 +64,12 @@ service.interceptors.response.use(
         }
     },
     error => {
-        element.Message({
-            type:"error",
-            message:error.data.msg,
-            duration: 3000
-        })
+        if(error.data){
+            element.Message({
+                type:"error",
+                message:error.data.msg,
+                duration: 3000
+            })
+        }
+
         return Promise.reject(error.response);})

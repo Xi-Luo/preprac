@@ -41,27 +41,21 @@ export default {
     return {
       page:1,
       total:0,
-      notices:[{
-        //res.data.data.content
-        id:7,
-        title: "新的申请单提交通知",
-        content: '申请人a提交了一份申请单。',
-        state: true,
-        time: '2020年1月30日'
-      },{
-        //res.data.data.content
-        id:7,
-        title: "新的申请单提交通知",
-        content: '申请人a提交了一份申请单。',
-        state: true,
-        time: '2020年1月30日'
-      }]
+      notices:[]
     }
   },
   created(){
+    this.markedAsRead()
     this.getNotices(1)
   },
   methods:{
+    markedAsRead(){
+      this.$axios.get('/notice/notices/read',{
+        params:{
+          uid:this.$store.state.userName
+        }
+      }).then().catch(err=>{console.log(err)})
+    },
     getNotices(page){
       this.$axios.get('/notice/notices',{
         params:{

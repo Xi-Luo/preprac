@@ -155,7 +155,6 @@ export default {
       return sums
     },
     getOrders(page){
-      console.log('this is searchform', this.searchForm)
       this.$axios.get('/order/orders', {
         params:{
           oid:this.searchForm.oid,
@@ -168,8 +167,6 @@ export default {
           page:page
         }
       }).then((res)=>{
-
-        console.log('this is res ', res)
 
         if(res.data.success){
           this.orderApplies = res.data.data.content;

@@ -91,7 +91,6 @@ export default {
               username:this.form.username,
               password: this.form.password
             }).then(response=>{
-              console.log('this is login res',response)
             if(response.data.success===true){
               this.$store.commit('tokenSave',response.headers.authorization);
               this.$store.commit('userNameSave',this.form.username)
@@ -109,6 +108,7 @@ export default {
                 message:'帐号或密码错误',
                 type: 'error'
               });
+              router.push()
             }
           }).catch(error=>{console.log(error);})
         }else{

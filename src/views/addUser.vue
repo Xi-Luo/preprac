@@ -116,10 +116,19 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="是否采购负责人" prop="inCharge0" :label-width="formLabelWidth">
+          <el-select v-model="editForm.inCharge0" placeholder="请选择">
+            <el-option
+                v-for="item in chargeOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button @click="chargeMan" type="warning">任命为采购负责人</el-button>
         <el-button type="primary" @click="editConfirm">确 定</el-button>
       </div>
     </el-dialog>
@@ -179,6 +188,11 @@ export default {
           name:'普通用户'
         }
       ],
+      chargeOptions:[
+        {id:0,name:'否'},
+        {id:1,name:'采购负责人'},
+        {id:2,name:'总采购负责人'}
+      ],
       departmentOptions: [],
       dialogFormVisible: false,
       addForm:{
@@ -193,7 +207,9 @@ export default {
         username:'',
         department:'',
         password:'',
-        role:''
+        role:'',
+        inCharge:'',
+        inCharge0:''
       },
       formLabelWidth:'80px',
       userId:'',
@@ -218,28 +234,7 @@ export default {
     }
   },
   created() {
-    this.$axios.get('/admin/user/users',{
-      params:{
-        page:this.page
-      }
-    }).then(res=>{
-      if(res.data.success){
-        this.userList = res.data.data.content
-        for(let i = 0; i<this.userList.length;i++){
-          if(this.userList[i].inCharge===false){
-            this.userList[i].inCharge0 = '否'
-          }else{
-            this.userList[i].inCharge0 = '是'
-          }
-        }
-        this.total = res.data.data.totalElements
-        this.page = res.data.data.number+1;
-        this.isLoading = false
-      }else{
-        this.$message.error('获取失败')
-        this.isLoading = false
-      }
-    }).catch(err=>{console.log(err)})
+    this.getUsers(1)
 
     this.$axios.get('/department/departments')
         .then((res)=>{
@@ -247,18 +242,41 @@ export default {
         }).catch(err=>{console.log(err)})
   },
   methods:{
+    getUsers(p){
+      this.$axios.get('/admin/user/users',{
+        params:{
+          page:p
+        }
+      }).then(res=>{
+        if(res.data.success){
+          this.userList = res.data.data.content
+          for(let i = 0; i<this.userList.length;i++){
+            if(this.userList[i].inCharge==='0'){
+              this.userList[i].inCharge0 = '否'
+            }else if(this.userList[i].inCharge==='1'){
+              this.userList[i].inCharge0 = '采购负责人'
+            }else {
+              this.userList[i].inCharge0 = '总采购负责人'
+            }
+          }
+          this.total = res.data.data.totalElements
+          this.page = res.data.data.number+1;
+          this.isLoading = false
+        }else{
+          this.$message.error('获取失败')
+          this.isLoading = false
+        }
+      }).catch(err=>{console.log(err)})
+    },
     chargeMan(){
+      console.log('this is type',this.editForm.type)
       this.$axios.get('/admin/user/appointment',{
         params:{
-          username:this.editForm.id
+          uid:this.editForm.id,
+          type:this.editForm.inCharge0
         }
       }).then((res)=>{
         console.log(res)
-        if(res.data.success){
-          this.$message.success('任命成功')
-        }else{
-          this.$message.error('任命失败')
-        }
       })
     },
     downloadFile(){
@@ -293,22 +311,7 @@ export default {
     uploadSuccess(){
       this.$message.success('上传成功')
       this.batchAddVisible = false
-
-      this.$getAxios(true).get('/admin/user/users',{
-        params:{
-          page:this.page
-        }
-      }).then(res=>{
-        if(res.data.success){
-          this.userList = res.data.data.content
-          this.total = res.data.data.totalElements
-          this.page = res.data.data.number+1;
-          this.isLoading = false
-        }else{
-          this.$message.error('获取失败')
-          this.isLoading = false
-        }
-      }).catch(err=>{console.log(err)})
+      this.getUsers(1)
     },
     editConfirm(){
       this.$getAxios(true).put('/admin/user',this.editForm)
@@ -320,7 +323,12 @@ export default {
           this.$message.error('修改失败')
         }
         this.editDialogVisible = false
-      })
+      }).catch(err=>{console.log(err)})
+      let reg = /^\d+$/
+      if(reg.test(this.editForm.inCharge0)){
+        this.chargeMan()
+      }
+      this.getUsers(1)
     },
     search(){
       if(this.userId){
@@ -332,28 +340,20 @@ export default {
           if (res.data.success){
             this.userList = []
             this.userList.push(res.data.data)
+            for(let i = 0; i<this.userList.length;i++){
+              if(this.userList[i].inCharge===false){
+                this.userList[i].inCharge0 = '否'
+              }else{
+                this.userList[i].inCharge0 = '是'
+              }
+            }
           }else {
             this.$message.info('未找到该用户')
           }
         }).catch(err=>{console.log(err)})
       }else {//当输入值为空返回所有用户
-        this.$getAxios(true).get('/admin/users',{
-          params:{
-            page:this.page
-          }
-        }).then(res=>{
-          if(res.data.success){
-            this.userList = res.data.data.content
-            this.total = res.data.data.totalElements
-            this.page = res.data.data.number+1;
-            this.isLoading = false
-          }else{
-            this.$message.error('获取失败')
-            this.isLoading = false
-          }
-        }).catch(err=>{console.log(err)})
+        this.getUsers(1)
       }
-
     },
     addConfirm(){
       this.$refs['addForm'].validate((valid)=>{
@@ -362,6 +362,7 @@ export default {
               .then(res=>{
                 if (res.data.success){
                   this.$message.success('添加成功')
+                  this.getUsers(1)
                 }else {
                   this.$message.error('添加失败')
                 }
@@ -377,24 +378,14 @@ export default {
       this.dialogFormVisible=true
     },
     currentChange(current){
-      this.$getAxios(true).get('/admin/users',{
-        params:{
-          page:current
-        }
-      }).then(res=>{
-            if(res.data.success){
-              this.userList = res.data.data.content
-              this.total = res.data.data.totalElements
-              this.page = res.data.data.number+1;
-              this.isLoading = false
-            }else{
-              this.$message.error('获取失败')
-              this.isLoading = false
-            }
-          }).catch(err=>{console.log(err)})
+      this.getUsers(current)
     },
     handleClick(index,row){
-      this.editForm = row
+      for(let key in row){
+        if(Object.hasOwnProperty.call(row,key)){
+          this.editForm[key]=row[key]
+        }
+      }
       this.editDialogVisible = true
     }
   }

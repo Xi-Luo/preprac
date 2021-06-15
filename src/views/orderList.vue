@@ -2,9 +2,11 @@
   <div>
     <navbar></navbar>
     <div style="padding-top: 65px;">
+      <div style="margin-top: 1vh;margin-bottom: 1vh;margin-left: 1rem">
+        <el-button type="primary" @click="getPackage">形成采购单</el-button>
+      </div>
       <div style="display:table;margin:0 auto">
         <el-table
-            max-height="520"
             :data="orderList"
             border
             @selection-change="handleSelectionChange"
@@ -21,12 +23,15 @@
               :prop="item.prop"
               :label="item.label"
           ></el-table-column>
-
         </el-table>
       </div>
-      <div style="text-align: right;margin-top: 1rem;margin-right: 1rem">
-        <el-button type="primary" @click="getPackage">形成采购单</el-button>
+      <div v-if="!loadingDone" id="loading" class="loading">
+        加载中...
       </div>
+      <div v-if="loadingDone" id="done" class="loading" >
+        没有更多数据
+      </div>
+
     </div>
 
     <el-dialog title="形成采购单" width="400px" :visible.sync="packageDialog" :close-on-click-modal="false">
@@ -64,6 +69,7 @@ export default {
       }
     }
     return {
+      loadingDone:false,
       purchaceForm:{
         uid:''
       },
@@ -96,13 +102,18 @@ export default {
   created() {
     this.getOrderList()
   },
+  mounted() {
+    let io = new IntersectionObserver(this.getOrderList)
+    let loading = document.getElementById('loading')
+    io.observe(loading)
+  },
   methods:{
     // handleSelect(item){
     //
     //
     // },
     querySearchAsync(queryString,cb){
-      this.$axios.get('/admin/user/users/info',{
+      this.$axios.get('/user/users/info',{
         params:{
           username:queryString
         }
@@ -120,7 +131,7 @@ export default {
     packageConfirm(){
       this.$refs['purchaceForm'].validate((valid)=>{
         if(valid){
-          this.$axios.post('/admin/purchace',{
+          this.$axios.post('/purchace',{
             orderLists:this.multipleId,
             uid :this.purchaceForm.uid
           }).then(res=>{
@@ -146,14 +157,21 @@ export default {
       }
     },
     getOrderList(){
-      this.$axios.get('/orderlist/all',{
-        params:{
-          page:this.page
-        }
-      }).then(res=>{
-        console.log(res)
-        this.orderList = res.data.data.content
-      }).catch(err=>{console.log(err)})
+      if(!this.loadingDone){
+        console.log('this is page',this.page)
+        this.$axios.get('/orderlist/all',{
+          params:{
+            page:this.page
+          }
+        }).then(res=>{
+          console.log('this is getOrderList',res)
+          this.orderList = this.orderList.concat(res.data.data.content)
+          if(res.data.data.content.length<10){
+            this.loadingDone = true
+          }
+        }).catch(err=>{console.log(err)})
+        this.page++
+      }
     },
     handleSelectionChange(val){
       this.multipleSelection = val
@@ -167,5 +185,7 @@ export default {
 </script>
 
 <style scoped>
-
+.loading{
+  text-align: center;
+}
 </style>
