@@ -29,9 +29,19 @@
             :label="item.label"
             :width="item.width"
           ></el-table-column>
-
-
       </el-table>
+
+      <div class="parent-page">
+        <div class="child-page">
+          <el-pagination
+              background
+              layout="prev, pager, next"
+              :current-page="page"
+              @current-change="currentChange"
+              :total="total">
+          </el-pagination>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -47,6 +57,8 @@ export default {
   },
   data(){
     return{
+      page:1,
+      total:0,
       uid:'',
       dialogFormVisible:false,
       purchaceOrders:[],
@@ -73,26 +85,36 @@ export default {
     }
   },
   created() {
-    this.getOrders()
+    this.getOrders(1)
   },
   methods:{
     handleSelectionChange(){},
-    getOrders(){
-      this.$axios.get('/user/purchace/purchaces',{
+    getOrders(p){
+      this.$axios.get('/purchace/purchaces',{
         params:{
-          page:1
+          page:p
         }
       }).then(res=>{
         if(res.data.success){
           console.log(res.data.data)
           this.purchaceOrders = res.data.data.content
+          this.total=res.data.data.totalElements
         }
       }).catch(err=>{console.log(err)})
-    }
+    },
+    currentChange(current){
+      this.getOrders(current)
+    },
   }
 }
 </script>
 
 <style scoped>
-
+.parent-page{
+  text-align: center;
+  margin-top: 10px;
+}
+.child-page{
+  display: inline-block;
+}
 </style>
