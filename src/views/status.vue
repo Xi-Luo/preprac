@@ -5,11 +5,11 @@
     </div>
     <div class="mainBody">
       <div class="addBtn">
-        <el-button type="primary" @click="addCode">添加经费代码</el-button>
+        <el-button type="primary" @click="addCode">添加申请单状态</el-button>
       </div>
 
       <el-table
-          :data="codeList"
+          :data="statusList"
           border
           v-loading="isLoading">
         <el-table-column
@@ -33,9 +33,9 @@
       </el-table>
     </div>
 
-    <el-dialog title="添加经费代码" :visible.sync="addFormVisible" :close-on-click-modal="false" width="350px">
+    <el-dialog title="添加申请单状态" :visible.sync="addFormVisible" :close-on-click-modal="false" width="350px">
       <el-form ref="addForm" :rules="addRules" :model="addForm">
-        <el-form-item label="经费代码" prop="value" :label-width="formLabelWidth">
+        <el-form-item label="申请单状态" prop="value" :label-width="formLabelWidth">
           <el-input v-model="addForm.value" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -45,9 +45,9 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="编辑经费代码" :visible.sync="editFormVisible" :close-on-click-modal="false" width="350px">
+    <el-dialog title="编辑申请单状态" :visible.sync="editFormVisible" :close-on-click-modal="false" width="350px">
       <el-form ref="editForm" :rules="addRules" :model="editForm">
-        <el-form-item label="经费代码" prop="value" :label-width="formLabelWidth">
+        <el-form-item label="申请单状态" prop="value" :label-width="formLabelWidth">
           <el-input v-model="editForm.value" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -62,8 +62,9 @@
 
 <script>
 import navbar from "@/components/navbar";
+
 export default {
-  name: "codeManage",
+ name: "status",
   components:{
     navbar
   },
@@ -76,14 +77,14 @@ export default {
       }
     }
     return{
-      formLabelWidth:'80px',
+      formLabelWidth:'100px',
       isLoading:true,
       tableList:[
-        {prop: 'value',label: '经费代码', width: '150'}
+        {prop: 'value',label: '申请单状态', width: '150'}
       ],
-      codeList:[],
+      statusList:[],
       addForm:{
-        description: '采购经费代码',
+        description: '申请单状态',
         value:''
       },
       addRules:{
@@ -92,7 +93,7 @@ export default {
       addFormVisible:false,
       editForm:{
         id:'',
-        description: '采购经费代码',
+        description: '申请单状态',
         value:''
       },
       editFormVisible:false
@@ -105,12 +106,12 @@ export default {
     getCodeList(){
       this.$axios.get('/admin/settings/all',{
         params:{
-          description:'采购经费代码'
+          description:'申请单状态'
         }
       }).then(res=>{
         if(res.data.success){
           console.log(res.data)
-          this.codeList = res.data.data
+          this.statusList = res.data.data
           this.isLoading=false
         }
       }).catch(err=>{console.log(err)})

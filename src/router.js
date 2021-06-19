@@ -16,11 +16,17 @@ import orderList from "@/views/orderList";
 import purchaceOrder from "@/views/purchaceOrder";
 import departmentManage from "@/views/departmentManage";
 import codeManage from "@/views/codeManage";
+import status from "@/views/status";
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
     routes:[
+        {
+            path:'/status',
+            name: 'status',
+            component: status
+        },
         {
             path:'/code',
             name: 'code',
