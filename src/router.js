@@ -17,11 +17,23 @@ import purchaceOrder from "@/views/purchaceOrder";
 import departmentManage from "@/views/departmentManage";
 import codeManage from "@/views/codeManage";
 import status from "@/views/status";
+import listOrderApply from "@/views/listOrderApply";
+import applyDetail from "@/views/applyDetail";
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
     routes:[
+        {
+            path:'/applyDetail',
+            name: 'applyDetail',
+            component: applyDetail
+        },
+        {
+            path:'/listOrderApply',
+            name: 'listOrderApply',
+            component: listOrderApply
+        },
         {
             path:'/status',
             name: 'status',
