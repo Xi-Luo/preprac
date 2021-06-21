@@ -151,6 +151,7 @@ export default {
           .then(res=>{
             if(res.data.success){
               this.$message.success('状态完成')
+              this.getStatus()
             }else{
               this.$message.error('状态完成失败')
             }
