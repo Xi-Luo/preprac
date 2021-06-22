@@ -62,7 +62,6 @@ export default {
   methods:{
     handleSelect(key) {
       this.$router.push({path:key})
-      console.log('this is path',key)
     },
     handleCommand(command){
       if(command==='exit'){

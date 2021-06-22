@@ -136,7 +136,6 @@ export default {
       })
     },
     handleDelete(index,row){
-      console.log(index,row)
       this.$confirm('删除部门将移除部门内所有用户，确定要删除吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

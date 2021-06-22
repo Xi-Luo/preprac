@@ -109,7 +109,6 @@ export default {
         }
       }).then(res=>{
         if(res.data.success){
-          console.log(res.data)
           this.codeList = res.data.data
           this.isLoading=false
         }
@@ -136,7 +135,6 @@ export default {
       })
     },
     handleDelete(index,row){
-      console.log(index,row)
       this.$confirm('确定删除吗？',{
         confirmButtonText:'确定',
         cancelButtonText:'取消',

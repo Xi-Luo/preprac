@@ -67,7 +67,6 @@ export default {
         {prop:'id',label:'序号',width:'100'},
         {prop:'uid',label: '采购人', width: '180'},
         {prop:'createTime',label:'创建时间',width:'180'},
-        {prop:'status0', label: '状态', width: '120'},
         {prop: 'updateTime', label: '更新时间', width: '180'}
       ],
       expandTable:[
@@ -96,7 +95,6 @@ export default {
         }
       }).then(res=>{
         if(res.data.success){
-          console.log(res.data.data)
           this.purchaceOrders = res.data.data.content
           this.total=res.data.data.totalElements
         }

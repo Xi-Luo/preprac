@@ -83,7 +83,6 @@ export default {
         }
       }).then(res=>{
         if(res.data.success){
-          console.log(res.data)
           this.orderList = res.data.data.content
           this.total = res.data.data.totalElements
           this.isLoading = false

@@ -134,19 +134,13 @@ export default {
     },
     uploadFile(index,row){
       this.uploadUrl = this.uploadUrl + '?'+'oid='+this.id+'&status='+ row.status
-      console.log(this.uploadUrl)
       this.chooseStatus = row.status
       this.uploadData.status = row.status
       this.uploadData.oid = this.id
       this.fileVisible = true
     },
     finish(index,row){
-      // let form = new FormData()
-      // form.append('oid',this.orderApply.id)
-      // form.append('status',row.status)
-
       this.uploadUrl = this.uploadUrl + '?'+'oid='+this.id+'&status='+ row.status
-      console.log(this.uploadUrl)
       this.$axios.post(this.uploadUrl)
           .then(res=>{
             if(res.data.success){
